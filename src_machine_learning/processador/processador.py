@@ -90,9 +90,10 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         dataframe['preco'] = pd.to_numeric(dataframe['preco'])
         dataframe = dataframe[dataframe['preco'] <= 500000.00]
         dataframe[self._colunas_categoricas] = dataframe[self._colunas_categoricas].astype('category')
+        return dataframe
 
     def _realizar_engenharia_atributos_df(self, dataframe: pd.DataFrame) -> pd.DataFrame:
-
+        print(dataframe)
         dataframe['motor_cilindrada'] = dataframe['modelo'].apply(self._extrair_motor)
         dataframe['ano_modelo'] = dataframe['codigo_ano'].str.split('-').str[0].astype(int)
         dataframe = dataframe[dataframe['ano_modelo'] >= 2000]

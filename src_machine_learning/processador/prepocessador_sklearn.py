@@ -38,7 +38,9 @@ class PrepocessadorSklearnn(Processador[EstrategiaModelo]):
         return [feature_engineering, preprocessador]
 
     def executar(self) -> ModeloMachineLearning:
-        self.abrir_dataframe()
-        self.fazer_processamento()
-        dataframe = self.realizar_engenharia_atributos()
+        dataframe = self.abrir_dataframe()
+        print(dataframe)
+        dataframe = self.fazer_processamento(dataframe=dataframe)
+        dataframe = self._realizar_engenharia_atributos_df(dataframe=dataframe)
+        print(dataframe)
         return self.preparar_modelo()
