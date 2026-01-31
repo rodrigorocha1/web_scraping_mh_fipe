@@ -57,11 +57,10 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         }
         self._features_numericas = ['preco', 'motor_cilindrada', 'ano_modelo']
         self._features_categoricas = ['marca', 'modelo', 'tipo_combustivel']
-        self._dataframe = None
 
     @staticmethod
     def _extrair_motor(model_str: str):
-        # Verifica se o valor é nulo ou não é uma string
+
         if pd.isna(model_str) or not isinstance(model_str, str):
             return None
 
@@ -78,30 +77,31 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         return None
 
     def abrir_dataframe(self):
-        self._dataframe = pd.read_csv(self.__caminho_arquivo)
+        dataframe = pd.read_csv(self.__caminho_arquivo)
+        return dataframe
 
-    def fazer_processamento(self):
-        self._dataframe = self._dataframe[self._dataframe['Brand_Code'].isin(self.__marcas_ids)].copy()
-        self._dataframe.rename(columns=self._colunas_rename, inplace=True)
+    def fazer_processamento(self, dataframe: pd.DataFrame):
+        dataframe = dataframe[dataframe['Brand_Code'].isin(self.__marcas_ids)].copy()
+        dataframe.rename(columns=self._colunas_rename, inplace=True)
 
-        self._dataframe['preco'] = self._dataframe['preco'].astype(str).str.replace('R$ ', '', regex=False)
-        self._dataframe['preco'] = self._dataframe['preco'].str.replace('.', '', regex=False)
-        self._dataframe['preco'] = self._dataframe['preco'].str.replace(',', '.', regex=False)
-        self._dataframe['preco'] = pd.to_numeric(self._dataframe['preco'])
-        self._dataframe = self._dataframe[self._dataframe['preco'] <= 500000.00]
-        self._dataframe[self._colunas_categoricas] = self._dataframe[self._colunas_categoricas].astype('category')
+        dataframe['preco'] = dataframe['preco'].astype(str).str.replace('R$ ', '', regex=False)
+        dataframe['preco'] = dataframe['preco'].str.replace('.', '', regex=False)
+        dataframe['preco'] = dataframe['preco'].str.replace(',', '.', regex=False)
+        dataframe['preco'] = pd.to_numeric(dataframe['preco'])
+        dataframe = dataframe[dataframe['preco'] <= 500000.00]
+        dataframe[self._colunas_categoricas] = dataframe[self._colunas_categoricas].astype('category')
 
-    def engenharia_atributos_df(self) -> pd.DataFrame:
-        X = self._dataframe.copy()
-        X['motor_cilindrada'] = X['modelo'].apply(self._extrair_motor)
-        X['ano_modelo'] = X['codigo_ano'].str.split('-').str[0].astype(int)
-        X = X[X['ano_modelo'] >= 2000]
-        X.drop(
+    def _realizar_engenharia_atributos_df(self, dataframe: pd.DataFrame) -> pd.DataFrame:
+
+        dataframe['motor_cilindrada'] = dataframe['modelo'].apply(self._extrair_motor)
+        dataframe['ano_modelo'] = dataframe['codigo_ano'].str.split('-').str[0].astype(int)
+        dataframe = dataframe[dataframe['ano_modelo'] >= 2000]
+        dataframe.drop(
             columns=['tipo', 'codigo_marca', 'codigo_modelo', 'codigo_ano',
                      'ano_combustivel', 'codigo_fipe', 'sigla_combustivel', 'Month'],
             inplace=True
         )
-        return X
+        return dataframe
 
     @abstractmethod
     def executar(self) -> ModeloMachineLearning:

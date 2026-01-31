@@ -1,3 +1,5 @@
+from typing import TypeVar
+
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
@@ -5,8 +7,8 @@ from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardSc
 from src_machine_learning.processador.processador import Processador, ModeloMachineLearning
 from sklearn.pipeline import Pipeline
 
-
-class PrepocessadorSklearnn(Processador):
+EstrategiaModelo = TypeVar('EstrategiaModelo')
+class PrepocessadorSklearnn(Processador[EstrategiaModelo]):
 
 
 
@@ -31,7 +33,7 @@ class PrepocessadorSklearnn(Processador):
             verbose_feature_names_out=False
         )
 
-        feature_engineering = ('feature_engineering', FunctionTransformer(self.realizar_engenharia_atributos, validate=False))
+        feature_engineering = ('feature_engineering', FunctionTransformer(self._realizar_engenharia_atributos_df, validate=False))
         preprocessador = ('preprocessor', preprocessor)
         return [feature_engineering, preprocessador]
 
