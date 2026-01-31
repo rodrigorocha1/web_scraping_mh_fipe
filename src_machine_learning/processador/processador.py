@@ -1,4 +1,6 @@
 import re
+from abc import ABC, abstractmethod
+from typing import TypeVar, Generic
 
 import pandas as pd
 
@@ -8,8 +10,10 @@ pd.set_option("display.width", 1000)  # largura do console
 pd.set_option("display.max_colwidth", 40)  # largura do conteúdo
 pd.set_option("display.float_format", "{:.2f}".format)
 
+ModeloMachineLearning = TypeVar('ModeloMachineLearning')
 
-class Processador:
+
+class Processador(ABC, Generic[ModeloMachineLearning]):
 
     def __init__(self):
         self.__caminho_arquivo = "tabela-fipe-329.csv"
@@ -51,6 +55,9 @@ class Processador:
             'Price': 'preco',
 
         }
+        self._features_numericas = ['preco', 'motor_cilindrada', 'ano_modelo']
+        self._features_categoricas = ['marca', 'modelo', 'tipo_combustivel']
+        self._dataframe = None
 
     @staticmethod
     def _extrair_motor(model_str: str):
@@ -70,32 +77,36 @@ class Processador:
             return int(match.group(1))
         return None
 
-    def abrir_dataframe(self) -> pd.DataFrame:
-        return pd.read_csv(self.__caminho_arquivo)
+    def abrir_dataframe(self):
+        self._dataframe = pd.read_csv(self.__caminho_arquivo)
 
-    def fazer_processamento(self, dataframe: pd.DataFrame) -> pd.DataFrame:
-        dataframe = dataframe[dataframe['Brand_Code'].isin(self.__marcas_ids)].copy()
-        dataframe.rename(columns=self._colunas_rename, inplace=True)
+    def fazer_processamento(self):
+        self._dataframe = self._dataframe[self._dataframe['Brand_Code'].isin(self.__marcas_ids)].copy()
+        self._dataframe.rename(columns=self._colunas_rename, inplace=True)
 
-        dataframe['preco'] = dataframe['preco'].astype(str).str.replace('R$ ', '', regex=False)
-        dataframe['preco'] = dataframe['preco'].str.replace('.', '', regex=False)
-        dataframe['preco'] = dataframe['preco'].str.replace(',', '.', regex=False)
-        dataframe['preco'] = pd.to_numeric(dataframe['preco'])
-        dataframe = dataframe[dataframe['preco'] <= 500000.00]
-        dataframe[self._colunas_categoricas] = dataframe[self._colunas_categoricas].astype('category')
-        dataframe.drop(
-            columns=['tipo', 'codigo_marca', 'codigo_modelo', 'ano_combustivel', 'codigo_fipe', 'sigla_combustivel',
-                     'Month'], inplace=True)
+        self._dataframe['preco'] = self._dataframe['preco'].astype(str).str.replace('R$ ', '', regex=False)
+        self._dataframe['preco'] = self._dataframe['preco'].str.replace('.', '', regex=False)
+        self._dataframe['preco'] = self._dataframe['preco'].str.replace(',', '.', regex=False)
+        self._dataframe['preco'] = pd.to_numeric(self._dataframe['preco'])
+        self._dataframe = self._dataframe[self._dataframe['preco'] <= 500000.00]
+        self._dataframe[self._colunas_categoricas] = self._dataframe[self._colunas_categoricas].astype('category')
 
-        return dataframe
+    def engenharia_atributos_df(self) -> pd.DataFrame:
+        X = self._dataframe.copy()
+        X['motor_cilindrada'] = X['modelo'].apply(self._extrair_motor)
+        X['ano_modelo'] = X['codigo_ano'].str.split('-').str[0].astype(int)
+        X = X[X['ano_modelo'] >= 2000]
+        X.drop(
+            columns=['tipo', 'codigo_marca', 'codigo_modelo', 'codigo_ano',
+                     'ano_combustivel', 'codigo_fipe', 'sigla_combustivel', 'Month'],
+            inplace=True
+        )
+        return X
 
-    def realizar_engenharia_atributos(self, dataframe: pd.DataFrame) -> pd.DataFrame:
-        dataframe = dataframe[(dataframe['ano_modelo'] >= 2000)]
-        dataframe['motor_cilindrada'] = dataframe['modelo'].apply(self._extrair_motor)
-        dataframe['ano_modelo'] = dataframe['codigo_ano'].str.split('-').str[0]
-        dataframe['ano_modelo'] = dataframe['ano_modelo'].astype(int)
-        dataframe = dataframe[(dataframe['ano_modelo'] >= 2000)]
-        return dataframe
+    @abstractmethod
+    def executar(self) -> ModeloMachineLearning:
+        pass
 
-    def preparar_modelo(self, **kwargs):
+    @abstractmethod
+    def preparar_modelo(self, **kwargs) -> ModeloMachineLearning:
         pass

@@ -1,9 +1,9 @@
-from src_machine_learning.processador.processador import Processador
+from typing_extensions import TypeVar
+
+from src_machine_learning.processador.prepocessador_b import PrepocessadorB
+from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
 
 
-p = Processador()
 
-dataframe = p.abrir_dataframe()
-dataframe = p.fazer_processamento(dataframe)
-dataframe = p.realizar_engenharia_atributos(dataframe)
-# print(dataframe.head())
+p = PrepocessadorSklearnn()
+
