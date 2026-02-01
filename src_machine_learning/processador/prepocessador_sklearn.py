@@ -135,6 +135,9 @@ class PrepocessadorSklearnn(Processador):
                 y_completo = pd.concat([y_train, y_test], axis=0)
                 # x_completo = self._realizar_engenharia_atributos_df(x_completo)
                 # print(x_completo.describe())
+                flag_polinomial = self._estrategia_modelo.polinomial
+                if flag_polinomial:
+                    nome_modelo = f'{nome_modelo}_polinomial'
 
                 passos_pipeline = self._preparar_modelo()
                 self._estrategia_modelo.pipeline = passos_pipeline
@@ -179,6 +182,9 @@ class PrepocessadorSklearnn(Processador):
                         y=y_completo,
                         iteracao=i
                     )
+                    flag_polinomial = self._estrategia_modelo.polinomial
+                    if flag_polinomial:
+                        nome_modelo = f'{nome_modelo}_polinomial'
                     resultado_validacao_cruzada['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                     resultado_validacao_cruzada['nome_modelo']  =nome_modelo
                     os.makedirs(name=f'dados/resultados_validacao_cruzada/{nome_modelo}/', exist_ok=True)
