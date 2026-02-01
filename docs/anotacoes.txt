@@ -21,3 +21,48 @@ Volvo
 
 500 LOUNGE 1.4 16V 100cv Mec.
 500 LOUNGE 1.4 16V 100cv Mec.
+
+
+case 2:
+                x_trains, x_tests, y_trains, y_tests, pipelines = self.realizar_prepocessamento_sklearn(opcao=opcao)
+                logging.info(f'Rodando Turing de paramentros para {self.__nome}')
+
+                self.__treinamento_modelo.passos_pipeline = pipelines
+                resultado: ResultadoBuscaT = self.__treinamento_modelo.realizar_grid_search(x=x_trains, y=y_trains)
+
+                resultado = resultado.best_params_
+
+                resultado['nome_modelo'] = self.__nome
+                resultado['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                salvar_json(
+                    dados=resultado,
+                    diretorio=f'dados/realizar_turing_parametros/{self.__nome}',
+                    nome_arquivo=f'realizar_turing_parametros_{self.__nome}'
+                )
+            case 3:
+                x_trains, x_tests, y_trains, y_tests, pipelines = self.realizar_prepocessamento_sklearn(opcao=opcao)
+
+                x_trains = x_trains.to_numpy()  # ou x_trains.values
+                x_tests = x_tests.to_numpy()
+                y_trains = y_trains.to_numpy()
+                y_tests = y_tests.to_numpy()
+                self.__treinamento_modelo.passos_pipeline = pipelines
+                print(x_trains.shape, y_trains.shape)
+                x_completa = np.concatenate([x_trains, x_tests], axis=0)
+                y_completa = np.concatenate([y_trains, y_tests], axis=0)
+
+                for i in range(30):
+                    logging.info(f'Fazendo validação cruzada para {self.__nome} - Iteração {i}')
+                    self.__treinamento_modelo.passos_pipeline = pipelines
+                    resultado_validacao_cruzada = self.__treinamento_modelo.realizar_validacao_cruzada(
+                        x=x_completa,
+                        y=y_completa,
+                        iteracao=i
+                    )
+                    resultado_validacao_cruzada['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                    resultado_validacao_cruzada['nome_modelo'] = self.__nome
+                    salvar_json(
+                        dados=resultado_validacao_cruzada,
+                        diretorio=f'dados/resultados_validacao_cruzada/{self.__nome}',
+                        nome_arquivo=f'resultado_validacao_cruzada_{self.__nome}'
+                    )

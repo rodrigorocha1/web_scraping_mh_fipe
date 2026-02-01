@@ -78,11 +78,11 @@ class AvaliadorSVR(Avaliador):
 
         return resultados
 
-    def gerar_grafico_underfit_overfit(self, **kwargs):
-        train_rmse = kwargs['train_rmse']
-        val_rmse = kwargs['val_rmse']
-        best_idx = kwargs['best_idx']
-        best_C = kwargs['best_C']
+    def gerar_grafico_underfit_overfit(self, dados: Dict[str, Any]):
+        train_rmse = dados['train_rmse']
+        val_rmse = dados['val_rmse']
+        best_idx = dados['best_idx']
+        best_C = dados['best_C']
         param_range = self.__param_range
 
         plt.figure(figsize=(10, 6))
@@ -97,7 +97,7 @@ class AvaliadorSVR(Avaliador):
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(
-            f'fig/gerar_grafico_over_under/regressao_svr/gerar_grafico_underfit_overfit_svr_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png'
+            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_svr_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png'
         )
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:

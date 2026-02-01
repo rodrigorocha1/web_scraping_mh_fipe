@@ -211,14 +211,14 @@ class AvaliadorFlorestaAleatoria(Avaliador):
 
         return resultados
 
-    def gerar_grafico_underfit_overfit(self, **kwargs):
+    def gerar_grafico_underfit_overfit(self, dados: Dict[str, Any]):
         plt.figure(figsize=(12, 7))
-        train_rmse = kwargs['train_rmse']
-        val_rmse = kwargs['val_rmse']
-        train_std = kwargs['train_std']
-        val_std = kwargs['val_std']
-        best_depth = kwargs['best_depth']
-        best_rmse = kwargs['best_rmse']
+        train_rmse = dados['train_rmse']
+        val_rmse = dados['val_rmse']
+        train_std = dados['train_std']
+        val_std = dados['val_std']
+        best_depth = dados['best_depth']
+        best_rmse = dados['best_rmse']
 
         # Curvas
         plt.plot(
@@ -294,7 +294,7 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(
-             f'fig/gerar_grafico_over_under/random_florest/gerar_grafico_underfit_overfit_random_florest_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png')
+            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_random_florest_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png')
         plt.close()
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:

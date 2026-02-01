@@ -78,11 +78,11 @@ class AvaliadorRedeNeural(Avaliador):
 
         return resultados
 
-    def gerar_grafico_underfit_overfit(self, **kwargs):
-        train_rmse = kwargs['train_rmse']
-        val_rmse = kwargs['val_rmse']
-        best_idx = kwargs['best_idx']
-        best_hidden_layer = kwargs['best_hidden_layer']
+    def gerar_grafico_underfit_overfit(self, dados: Dict[str, Any]):
+        train_rmse = dados['train_rmse']
+        val_rmse = dados['val_rmse']
+        best_idx = dados['best_idx']
+        best_hidden_layer = dados['best_hidden_layer']
         param_range = [str(h) for h in self.__param_range]
 
         plt.figure(figsize=(12, 10))
@@ -96,7 +96,7 @@ class AvaliadorRedeNeural(Avaliador):
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(
-            f'fig/gerar_grafico_over_under/rede_neural/gerar_grafico_underfit_overfit_rede_neural_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png'
+            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_rede_neural_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png'
         )
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) -> Dict[str, Any]:

@@ -1,7 +1,7 @@
 import os
 import re
 from datetime import datetime
-from src_machine_learning.utils.utils import salvar_json
+
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
@@ -11,6 +11,7 @@ from src_machine_learning.avaliador.avaliador import Avaliador
 from src_machine_learning.config.variaveis import PassoPipelineSklearn
 from src_machine_learning.estrategia_modelo.estrategia_modelo import EstrategiaModelo
 from src_machine_learning.processador.processador import Processador
+from src_machine_learning.utils.utils import salvar_json
 
 
 class PrepocessadorSklearnn(Processador):
@@ -63,17 +64,28 @@ class PrepocessadorSklearnn(Processador):
                     y_train=y_train,
                     X_train=x_train
                 )
+                resultado_previsoes_modelo_simples = self._avaliador.obter_resultados_modelo(
+                    pipeline=pipeline,
+                    y_test=y_test,
+                    y_pred=previsoes
+                )
 
                 dados['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
+                resultado_previsoes_modelo_simples['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
 
                 texto = self._estrategia_modelo.__class__.__name__
                 parte = re.sub(r'^Estrategia', '', texto)
                 resultado = re.sub(r'(?<!^)([A-Z])', r'_\1', parte).lower()
 
-
                 os.makedirs(name=f'fig/gerar_grafico_over_under/{resultado}/', exist_ok=True)
                 os.makedirs(name=f'dados/avaliador_modelo/{resultado}/', exist_ok=True)
+                os.makedirs(name=f'dados/resultado_previsoes_modelo_simples/{resultado}/', exist_ok=True)
+                salvar_json(
+                    dados=resultado_previsoes_modelo_simples,
+                    diretorio=f'dados/resultado_previsoes_modelo_simples/{resultado}',
+                    nome_arquivo=f'resultado_previsoes_modelo_simples_{resultado}'
+
+                )
                 salvar_json(
                     dados=dados,
                     diretorio=f'dados/avaliador_modelo/{resultado}',

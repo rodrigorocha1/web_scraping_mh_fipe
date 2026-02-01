@@ -18,6 +18,7 @@ class EstrategiaRegressaoArvoreDeDecisao(EstrategiaModeloSklearn):
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
             modelo=('regressor', self.modelo),
+
             param_grid=self.PARAM_GRID
 
         )
