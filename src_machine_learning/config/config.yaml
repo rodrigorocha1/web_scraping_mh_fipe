@@ -131,11 +131,14 @@ model:
       positive: False
 
     regressao_linear_ridge: #7
-       regressor__alpha: [ 0.01, 0.1, 1.0, 10.0, 100.0 ]
-       regressor__fit_intercept': [ True, False ]
+
 
     regressao_linear_lasso: #8
-        regressor__alpha': [0.001, 0.01, 0.1, 1.0, 10.0]
+      alpha: 0.1
+      fit_intercept: True
+      max_iter: 1000
+      tol: 0.0004
+      selection: "cyclic"
 
 
 

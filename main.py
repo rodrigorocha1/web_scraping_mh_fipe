@@ -10,11 +10,13 @@ from src_machine_learning.avaliador.avaliador_avore_decisao import AvaliadorArvo
 from src_machine_learning.avaliador.avaliador_floresta_aleatoria import AvaliadorFlorestaAleatoria
 from src_machine_learning.avaliador.avaliador_rede_neural import AvaliadorRedeNeural
 from src_machine_learning.avaliador.avaliador_regressao_linear import AvaliadorRegressaoLinear
+from src_machine_learning.avaliador.avaliador_regressao_linear_regularizada import AvaliadorRegressaoLinearRegularizada
 from src_machine_learning.avaliador.avaliador_svr import AvaliadorSVR
 from src_machine_learning.estrategia_modelo.estrategia_modelo import EstrategiaModelo
 from src_machine_learning.estrategia_modelo.estrategia_regressao_arvore_decisao import \
     EstrategiaRegressaoArvoreDeDecisao
 from src_machine_learning.estrategia_modelo.estrategia_regressao_linear import EstrategiaRegressaoLinear
+from src_machine_learning.estrategia_modelo.estrategia_regressao_linear_lasso import EstrategiaRegressaoLinearLasso
 from src_machine_learning.estrategia_modelo.estrategia_regressao_random_florest import EstrategiaRegressaoRandomFlorest
 from src_machine_learning.estrategia_modelo.estrategia_regressao_rede_neural import EstrategiaRegressaoRedeNeural
 from src_machine_learning.estrategia_modelo.estrategia_regressao_svr import EstrategiaRegressaoSVR
@@ -26,7 +28,8 @@ modelos : List[Tuple[Avaliador, EstrategiaModelo]] = [
     # (AvaliadorSVR(), EstrategiaRegressaoSVR()),
     # (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural()),
     # (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest()),
-    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear())
+    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear()),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso())
 ]
 opcao = 1
 for modelo in tqdm(
