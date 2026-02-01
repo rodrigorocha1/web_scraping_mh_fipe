@@ -19,11 +19,14 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
             self,
             param_modelo_regressao: Dict[str, Any],
             modelo: EtapaRegressao,
-            param_grid: Dict[str, Any]
+            param_grid: Dict[str, Any],
+            polinomial: bool = False,
+            modelo_polinomial: EtapaRegressao = None
     ):
-        super().__init__()
+        super().__init__(polinomial=polinomial)
         self.__params = param_modelo_regressao
         self.__modelo = modelo
+        self.__modelo_polinomial = modelo_polinomial
 
         self.__PARAM_GRID: Final[Dict[str, Any]] = param_grid
 
@@ -34,6 +37,8 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
         assert self._pipeline is not None
 
         self._pipeline.append(self.__modelo)
+        if self._polinomial:
+            self._pipeline.append(self.__modelo_polinomial)
 
         self._dados_treinamento = Pipeline(steps=self._pipeline)
 
@@ -48,6 +53,8 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
     ) -> GridSearchCV:
         assert self._pipeline is not None
         self._pipeline.append(self.__modelo)
+        if self._polinomial:
+            self._pipeline.append(self.__modelo_polinomial)
 
         pipeline = Pipeline(self._pipeline)
 

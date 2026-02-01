@@ -1,23 +1,23 @@
-from typing import Dict, Final, Any
+from typing import Final, Dict, Any
 
-from sklearn.linear_model import LinearRegression
+from sklearn.linear_model import ElasticNet
 from sklearn.preprocessing import PolynomialFeatures
 
 from src_machine_learning.estrategia_modelo.estrategia_modelo_sklearn import EstrategiaModeloSklearn
 from src_machine_learning.utils.utils import carregar_dados_yaml_lista
 
 
-class EstrategiaRegressaoLinear(EstrategiaModeloSklearn):
+class EstrategiaRegressaoElasticNet(EstrategiaModeloSklearn):
     PARAM_MODELO_REGRESSAO: Final[Dict[str, Any]] = \
-        carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[5][
+        carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[8][
             'parametros']  # trazer do arquivo yaml
-    PARAM_GRID: Final[Dict[str, Any]] = carregar_dados_yaml_lista(parametro_modelo='parametros_grid')[5][
+    PARAM_GRID: Final[Dict[str, Any]] = carregar_dados_yaml_lista(parametro_modelo='parametros_grid')[7][
         'parametros']  # trazer do arquivo yaml
+
     PARAM_POLINOMIAL: Final[Dict[str, Any]] = \
         carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[9][
             'parametros']
-
-    modelo = LinearRegression(**PARAM_MODELO_REGRESSAO)
+    modelo = ElasticNet(**PARAM_MODELO_REGRESSAO)
 
     def __init__(self):
         super().__init__(

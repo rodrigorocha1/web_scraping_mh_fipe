@@ -1,5 +1,5 @@
 from abc import ABC, abstractmethod
-from typing import Dict, Any, TypeVar, Generic, Optional, List, Tuple
+from typing import Dict, Any, TypeVar, Generic, Optional, List
 
 import numpy as np
 from pandas import DataFrame, Series
@@ -11,18 +11,26 @@ ResultadoBuscaT = TypeVar("ResultadoBuscaT")
 
 class EstrategiaModelo(ABC, Generic[PassosPipelineModelo, ResultadoBuscaT]):
 
-    def __init__(self) -> None:
-        self._resultados_modelo: Dict[str, Any]  = {}
-        self._pipeline : List = []
+    def __init__(self, polinomial: bool = False) -> None:
+        self._resultados_modelo: Dict[str, Any] = {}
+        self._pipeline: List = []
+        self._polinomial = polinomial
 
         self._dados_treinamento: Optional[Pipeline] = None
+    @property
+    def polinomial(self):
+        return self._polinomial
+
+    @polinomial.setter
+    def polinomial(self, polinomial):
+        self._polinomial = polinomial
 
     @property
     def dados_treinamento(self):
         return self._dados_treinamento
 
     @property
-    def pipeline(self) -> List[PassosPipelineModelo] :
+    def pipeline(self) -> List[PassosPipelineModelo]:
         return self._pipeline
 
     @pipeline.setter

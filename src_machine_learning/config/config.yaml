@@ -129,16 +129,41 @@ model:
     regressao_linear: # 6
       fit_intercept: True
       positive: False
+      random_state: 42
 
     regressao_linear_ridge: #7
-
+      alpha: 1.0
+      fit_intercept: True
+      solver: auto
+      positive: False
+      tol: 0.003
+      random_state: 42
+      copy_X: True
 
     regressao_linear_lasso: #8
       alpha: 0.1
       fit_intercept: True
       max_iter: 1000
       tol: 0.0004
-      selection: "cyclic"
+      random_state: 42
+
+    regressao_linear_elastic_net:
+      alpha: 1.0
+      l1_ratio: 0.5
+      fit_intercept: True
+      max_iter: 10_000
+      positive: False
+      random_state: 42
+
+
+    regressao_polinomial: #9
+      degree: 2
+      interaction_only: False
+      include_bias: False
+
+
+
+
 
 
 
@@ -320,3 +345,10 @@ model:
     #        normalize_type: tree
     #        rate_drop: 0.0
     #        skip_drop: 0.0
+
+  regressao_linear_ridge: #7
+
+
+  regressao_linear_lasso: #8
+
+  regressao_linear_elastic_net:
