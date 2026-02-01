@@ -3,6 +3,7 @@ import os
 import re
 from datetime import datetime
 
+import numpy as np
 import pandas as pd
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
@@ -142,4 +143,43 @@ class PrepocessadorSklearnn(Processador):
 
                 )
             case 3:
-                pass
+
+                texto = self._estrategia_modelo.__class__.__name__
+                parte = re.sub(r'^Estrategia', '', texto)
+                nome_modelo = re.sub(r'(?<!^)([A-Z])', r'_\1', parte).lower()
+
+                dataframe = self.abrir_dataframe()
+                dataframe = self.fazer_processamento(dataframe)
+                x_train, x_test, y_train, y_test = self._separar_treino_teste(dataframe=dataframe)
+                x_trains = x_train.to_numpy()
+                x_tests = x_test.to_numpy()
+                y_trains = y_train.to_numpy()
+                y_tests = y_test.to_numpy()
+
+                x_completo = np.concatenate((x_trains, x_tests), axis=0)
+                y_completo = np.concatenate((y_trains, y_tests), axis=0)
+                passos_pipeline = self._preparar_modelo()
+                self._estrategia_modelo.pipeline = passos_pipeline
+
+                for i in range(30):
+                    logging.info(f'Fazendo validação cruzada para {nome_modelo} - Iteração {i}')
+
+                    resultado_validacao_cruzada = self._estrategia_modelo.realizar_validacao_cruzada(
+                        x=x_completo,
+                        y=y_completo,
+                        iteracao=i
+                    )
+                    resultado_validacao_cruzada['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                    resultado_validacao_cruzada['nome_modelo']  =nome_modelo
+                    os.makedirs(name=f'dados/resultados_validacao_cruzada/{nome_modelo}/', exist_ok=True)
+                    salvar_json(
+                        dados=resultado_validacao_cruzada,
+                        diretorio=f'dados/resultados_validacao_cruzada/{nome_modelo}',
+                        nome_arquivo=f'resultado_validacao_cruzada_{nome_modelo}'
+                    )
+
+
+
+
+
+
