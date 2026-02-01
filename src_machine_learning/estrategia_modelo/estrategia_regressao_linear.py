@@ -20,10 +20,11 @@ class EstrategiaRegressaoLinear(EstrategiaModeloSklearn):
     modelo = LinearRegression(**PARAM_MODELO_REGRESSAO)
     print(PARAM_MODELO_REGRESSAO)
 
-    def __init__(self, polinomial: bool = False):
+    def __init__(self, polinomial: bool = False, opcao: int = 1):
+        self.__opcao = opcao
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
-            modelo=('regressor', self.modelo),
+            modelo=('regressor', self.modelo) if self.__opcao == 1 else ('regressor', LinearRegression()),
             param_grid=self.PARAM_POLINOMIAL if polinomial else self.PARAM_GRID,
             modelo_polinomial=("poly", PolynomialFeatures()),
             polinomial=polinomial
