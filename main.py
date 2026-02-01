@@ -1,13 +1,16 @@
 import logging
 import sys
 import time
+from typing import List, Tuple
 
 from tqdm import tqdm
 
+from src_machine_learning.avaliador.avaliador import Avaliador
 from src_machine_learning.avaliador.avaliador_avore_decisao import AvaliadorArvoreDecisao
 from src_machine_learning.avaliador.avaliador_floresta_aleatoria import AvaliadorFlorestaAleatoria
 from src_machine_learning.avaliador.avaliador_rede_neural import AvaliadorRedeNeural
 from src_machine_learning.avaliador.avaliador_svr import AvaliadorSVR
+from src_machine_learning.estrategia_modelo.estrategia_modelo import EstrategiaModelo
 from src_machine_learning.estrategia_modelo.estrategia_regressao_arvore_decisao import \
     EstrategiaRegressaoArvoreDeDecisao
 from src_machine_learning.estrategia_modelo.estrategia_regressao_random_florest import EstrategiaRegressaoRandomFlorest
@@ -16,7 +19,7 @@ from src_machine_learning.estrategia_modelo.estrategia_regressao_svr import Estr
 from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
 
 inicio_modelo = time.time()
-modelos = [
+modelos : List[Tuple[Avaliador, EstrategiaModelo]] = [
     (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao()),
     (AvaliadorSVR(), EstrategiaRegressaoSVR()),
     (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural()),
@@ -36,7 +39,7 @@ for modelo in tqdm(
         avaliador=avaliador,
         estratregia_modelo=modelo_ml
     )
-    p.executar(1)
+    p.executar(2)
     end_time = time.time()
     elapsed_time = end_time - inicio_modelo
     minutes = int(elapsed_time // 60)

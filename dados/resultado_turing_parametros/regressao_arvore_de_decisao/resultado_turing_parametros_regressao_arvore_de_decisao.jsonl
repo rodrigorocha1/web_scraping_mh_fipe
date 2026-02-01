@@ -1,1 +1,10 @@
-{"regressor__ccp_alpha": 0.0, "regressor__criterion": "squared_error", "regressor__max_depth": 20, "regressor__max_features": null, "regressor__max_leaf_nodes": null, "regressor__min_samples_leaf": 2, "regressor__min_samples_split": 10, "data_coleta": "01/02/2026 11:27:27"}
+{
+    "regressor__ccp_alpha": 0.0,
+    "regressor__criterion": "squared_error",
+    "regressor__max_depth": 20,
+    "regressor__max_features": null,
+    "regressor__max_leaf_nodes": null,
+    "regressor__min_samples_leaf": 2,
+    "regressor__min_samples_split": 10,
+    "data_coleta": "01/02/2026 11:56:31"
+}
