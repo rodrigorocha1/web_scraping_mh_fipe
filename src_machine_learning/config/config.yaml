@@ -19,11 +19,11 @@ model:
     random_forest:
       random_state: 42
       min_samples_leaf: 1
-      min_samples_split: 5
+      min_samples_split: 10
       criterion: friedman_mse
       ccp_alpha: 0.0
-      max_features: log2
-      max_depth: 30
+      max_features: null
+      max_depth: 20
 
     arvore_decisao:
       random_state: 42
@@ -39,11 +39,11 @@ model:
       kernel: rbf
       C: 50
       gamma: scale
-      epsilon: 0.05
+      epsilon: 0.1
 
     regressao_rede_neural:
       hidden_layer_sizes: [100, 50]
-      alpha: 0.01
+      alpha: 0.0001
       activation: relu
       solver: adam
       max_iter: 1000
@@ -51,7 +51,7 @@ model:
       n_iter_no_change: 20
       validation_fraction: 0.1
       random_state: 42
-      learning_rate_init: 0.0005
+      learning_rate_init: 0.001
       tol: 0.0001
 
     regressao_xgboost:
@@ -91,30 +91,32 @@ model:
     regressao_linear:
       fit_intercept: True
       positive: False
+      copy_X : True
+      n_jobs: null
 
     regressao_linear_ridge:
       alpha: 1.0
       fit_intercept: True
-      solver: auto
+      max_iter: 500
       positive: False
-      tol: 0.003
+      tol: 0.0001
       random_state: 42
-      copy_X: True
+
 
     regressao_linear_lasso:
-      alpha: 0.1
-      fit_intercept: True
-      max_iter: 1000
-      tol: 0.0004
+      alpha: 0.001
+      fit_intercept: False
+      max_iter: 500
+      tol: 0.01
       random_state: 42
+      positive: True
 
     regressao_linear_elastic_net:
-      alpha: 1.0
-      l1_ratio: 0.5
+      alpha: 0.001
       fit_intercept: True
-      max_iter: 10000
+      max_iter: 500
       positive: False
-      random_state: 42
+      tol: 0.0001
 
     regressao_polinomial:
       degree: 2
