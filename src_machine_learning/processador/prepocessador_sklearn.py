@@ -145,6 +145,7 @@ class PrepocessadorSklearnn(Processador):
 
                 resultado_grid = resultado_grid.best_params_
                 resultado_grid['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                resultado_grid['nome_modelo'] = nome_modelo
 
 
                 os.makedirs(name=f'dados/resultado_turing_parametros/{nome_modelo}/', exist_ok=True)
