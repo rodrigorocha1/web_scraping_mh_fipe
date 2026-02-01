@@ -78,6 +78,8 @@ class PrepocessadorSklearnn(Processador):
                 if flag_polinomial:
                     resultado = f'{resultado}_polinomial'
 
+
+
                 dados = self._avaliador.obter_dados_curva_validacao(
                     pipeline=pipeline,
                     y_train=y_train,
@@ -85,6 +87,7 @@ class PrepocessadorSklearnn(Processador):
                 )
                 os.makedirs(name=f'fig/gerar_grafico_over_under/{resultado}/', exist_ok=True)
                 if dados is not None:
+                    dados['nome_modelo'] = resultado
                     dados['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                     os.makedirs(name=f'dados/avaliador_modelo/{resultado}/', exist_ok=True)
                     salvar_json(
@@ -94,7 +97,7 @@ class PrepocessadorSklearnn(Processador):
                         identacao=4
 
                     )
-                    dados['nome_modelo'] = resultado
+
 
                     self._avaliador.gerar_grafico_underfit_overfit(dados)
 
@@ -107,6 +110,7 @@ class PrepocessadorSklearnn(Processador):
 
                 resultado_previsoes_modelo_simples['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
                 os.makedirs(name=f'dados/resultado_previsoes_modelo_simples/{resultado}/', exist_ok=True)
+                resultado_previsoes_modelo_simples['nome_modelo'] = resultado
                 salvar_json(
                     dados=resultado_previsoes_modelo_simples,
                     diretorio=f'dados/resultado_previsoes_modelo_simples/{resultado}',
