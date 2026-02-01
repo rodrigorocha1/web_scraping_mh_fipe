@@ -1,5 +1,6 @@
 import logging
 import sys
+import time
 
 from tqdm import tqdm
 
@@ -14,6 +15,7 @@ from src_machine_learning.estrategia_modelo.estrategia_regressao_rede_neural imp
 from src_machine_learning.estrategia_modelo.estrategia_regressao_svr import EstrategiaRegressaoSVR
 from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
 
+inicio_modelo = time.time()
 modelos = [
     (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao()),
     (AvaliadorSVR(), EstrategiaRegressaoSVR()),
@@ -34,6 +36,17 @@ for modelo in tqdm(
         avaliador=avaliador,
         estratregia_modelo=modelo_ml
     )
-    p.executar(2)
-    break
+    p.executar(1)
+    end_time = time.time()
+    elapsed_time = end_time - inicio_modelo
+    minutes = int(elapsed_time // 60)
+    seconds = int(elapsed_time % 60)
 
+    logging.info(
+        f'Tempo de execução do modelo {modelo_ml.__class__.__name__.split(".")[-1]}: : {minutes}:{seconds:02d} segundos')
+tempo_fim = time.time()
+tempo_execucao_total = tempo_fim - inicio_modelo
+
+minutos_total = int(tempo_execucao_total // 60)
+segundos_total = int(tempo_execucao_total % 60)
+logging.info(f'Tempo de execução total : {minutos_total}:{segundos_total:02d} segundos')
