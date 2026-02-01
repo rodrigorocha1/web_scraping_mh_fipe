@@ -224,8 +224,13 @@ model:
 
 
     modelo_regressao_linear: #5
+      teste: 5
       regressor__fit_intercept': [ True, False ]
       regressor__positive': [ True, False ]
+      regressor__normalize: deprecated,
+      copy_X: True
+      n_jobs: None,
+      positive: False
 
     modelo_regressao_linear_ridge: #6
       regressor__alpha: [ 0.01, 0.1, 1.0, 10.0, 100.0 ]

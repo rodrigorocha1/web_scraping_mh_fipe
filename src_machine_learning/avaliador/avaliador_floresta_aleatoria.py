@@ -289,7 +289,7 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         # Labels finais
         plt.xlabel('max_depth (Complexidade do Modelo)')
         plt.ylabel('RMSE')
-        plt.title('Decision Random Floreest — Diagnóstico de Overfitting vs Underfitting')
+        plt.title('Decision Floresta Aleatória — Diagnóstico de Overfitting vs Underfitting')
         plt.legend()
         plt.grid(True)
         plt.tight_layout()

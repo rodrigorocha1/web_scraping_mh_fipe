@@ -246,7 +246,7 @@ class AvaliadorArvoreDecisao(Avaliador):
         # Labels finais
         plt.xlabel('max_depth (Complexidade do Modelo)')
         plt.ylabel('RMSE')
-        plt.title('Decision Tree — Diagnóstico de Overfitting vs Underfitting')
+        plt.title('Árvore de decisão— Diagnóstico de Overfitting vs Underfitting')
         plt.legend()
         plt.grid(True)
         plt.tight_layout()

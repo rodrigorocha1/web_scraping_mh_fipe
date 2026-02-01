@@ -118,7 +118,7 @@ class AvaliadorRegressaoLinear(Avaliador):
 
         plt.xlabel("alpha (Regularização)")
         plt.ylabel("RMSE")
-        plt.title("Regressão Linear Regularizada — Bias vs Variance")
+        plt.title(f"Regressão Linear Regularizada -- — Bias vs Variance")
         plt.legend()
         plt.grid(True)
 

@@ -26,20 +26,20 @@ from src_machine_learning.processador.prepocessador_sklearn import Prepocessador
 
 inicio_modelo = time.time()
 modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
-    (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao()),
-    (AvaliadorSVR(), EstrategiaRegressaoSVR()),
-    (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural()),
-    (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest()),
+    # (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao()),
+    # (AvaliadorSVR(), EstrategiaRegressaoSVR()),
+    # (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural()),
+    # (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest()),
     (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear()),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso()),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge()),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet()),
-    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(polinomial=True))
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso()),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge()),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet()),
+    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(polinomial=True)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(polinomial=True)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(polinomial=True))
 ]
-opcao = 1
+opcao = 2
 for modelo in tqdm(
         modelos,
         desc=f"🔎 Treinando modelo  ",
