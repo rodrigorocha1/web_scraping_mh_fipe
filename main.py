@@ -23,23 +23,26 @@ from src_machine_learning.estrategia_modelo.estrategia_regressao_random_florest 
 from src_machine_learning.estrategia_modelo.estrategia_regressao_rede_neural import EstrategiaRegressaoRedeNeural
 from src_machine_learning.estrategia_modelo.estrategia_regressao_svr import EstrategiaRegressaoSVR
 from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
-
+opcao = 2
+opcao_execucao = 2
 inicio_modelo = time.time()
 modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
-    # (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao()),
-    # (AvaliadorSVR(), EstrategiaRegressaoSVR()),
-    # (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural()),
-    # (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest()),
-    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear()),
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso()),
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge()),
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet()),
-    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(polinomial=True)),
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(polinomial=True)),
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(polinomial=True))
+    # (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao = opcao)),
+    # (AvaliadorSVR(), EstrategiaRegressaoSVR(opcao = opcao)),
+    # (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural(opcao = opcao)),
+    # (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest(opcao = opcao)),
+    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao=opcao)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(opcao = opcao)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao = opcao)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao = opcao)),
+    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao = opcao, polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao = opcao,polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao = opcao, polinomial=True))
 ]
-opcao = 2
+
+inicio_total = time.time()  # tempo total do script
+
 for modelo in tqdm(
         modelos,
         desc=f"🔎 Treinando modelo  ",
@@ -49,21 +52,25 @@ for modelo in tqdm(
 ):
     avaliador, modelo_ml = modelo
     logging.info(f'Treinando modelo {modelo_ml.__class__.__name__.split(".")[-1]}')
+    inicio_modelo = time.time()
     p = PrepocessadorSklearnn(
         avaliador=avaliador,
         estratregia_modelo=modelo_ml
     )
-    p.executar(opcao)
-    end_time = time.time()
-    elapsed_time = end_time - inicio_modelo
-    minutes = int(elapsed_time // 60)
-    seconds = int(elapsed_time % 60)
+    p.executar(opcao_execucao)
+    fim_modelo = time.time()
 
+    tempo_modelo = fim_modelo - inicio_modelo
+    minutos_modelo = int(tempo_modelo // 60)
+    segundos_modelo = int(tempo_modelo % 60)
     logging.info(
-        f'Tempo de execução do modelo {modelo_ml.__class__.__name__.split(".")[-1]}: : {minutes}:{seconds:02d} segundos')
+        f'Tempo de execução do modelo {modelo_ml.__class__.__name__}: {minutos_modelo}:{segundos_modelo:02d} minutos'
+    )
 tempo_fim = time.time()
 tempo_execucao_total = tempo_fim - inicio_modelo
 
-minutos_total = int(tempo_execucao_total // 60)
-segundos_total = int(tempo_execucao_total % 60)
-logging.info(f'Tempo de execução total : {minutos_total}:{segundos_total:02d} segundos')
+fim_total = time.time()
+tempo_total = fim_total - inicio_total
+minutos_total = int(tempo_total // 60)
+segundos_total = int(tempo_total % 60)
+logging.info(f'Tempo de execução total : {minutos_total}:{segundos_total:02d} minutos')
