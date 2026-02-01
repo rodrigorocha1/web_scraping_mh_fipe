@@ -86,6 +86,7 @@ class PrepocessadorSklearnn(Processador):
                     nome_arquivo=f'resultado_previsoes_modelo_simples_{resultado}'
 
                 )
+
                 salvar_json(
                     dados=dados,
                     diretorio=f'dados/avaliador_modelo/{resultado}',
