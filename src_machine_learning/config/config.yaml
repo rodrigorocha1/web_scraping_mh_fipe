@@ -13,6 +13,7 @@ data:
 
 # --- Configuração do Modelo ---
 model:
+
   parametros_treinamento_simples:
 
     random_forest:
@@ -61,55 +62,48 @@ model:
       random_state: 42
       n_jobs: -1
       verbosity: 1
-
       max_depth: 6
       max_leaves: 0
       min_child_weight: 5
       max_delta_step: 0
       grow_policy: depthwise
-
       reg_alpha: 0.0
       reg_lambda: 1.0
       gamma: 0.0
-
       subsample: 0.8
       colsample_bytree: 0.8
       colsample_bylevel: 1.0
       colsample_bynode: 1.0
-
       eval_metric: rmse
       early_stopping_rounds: null
       callbacks: null
-
       tree_method: auto
       max_bin: 256
       predictor: auto
       sampling_method: uniform
-
       missing: null
       base_score: null
       importance_type: gain
       enable_categorical: false
-
       monotone_constraints: null
       interaction_constraints: null
 
     regressao_linear:
-      fit_intercept: true
-      positive: false
+      fit_intercept: True
+      positive: False
 
     regressao_linear_ridge:
       alpha: 1.0
-      fit_intercept: true
+      fit_intercept: True
       solver: auto
-      positive: false
+      positive: False
       tol: 0.003
       random_state: 42
-      copy_X: true
+      copy_X: True
 
     regressao_linear_lasso:
       alpha: 0.1
-      fit_intercept: true
+      fit_intercept: True
       max_iter: 1000
       tol: 0.0004
       random_state: 42
@@ -117,18 +111,17 @@ model:
     regressao_linear_elastic_net:
       alpha: 1.0
       l1_ratio: 0.5
-      fit_intercept: true
+      fit_intercept: True
       max_iter: 10000
-      positive: false
+      positive: False
       random_state: 42
 
     regressao_polinomial:
       degree: 2
-      interaction_only: false
-      include_bias: false
+      interaction_only: False
+      include_bias: False
 
   parametros_grid:
-
     modelo_xgboost:
       max_depth: [3, 5, 7, 10]
       min_child_weight: [1, 3, 5]
@@ -166,7 +159,7 @@ model:
       regressor__gamma: ["scale", 0.01, 0.001]
       regressor__epsilon: [0.05, 0.1]
 
-    modelo_random_forest:
+    modelo_random_florest:
       regressor__max_depth: [null, 5, 10, 20, 30]
       regressor__min_samples_split: [2, 5, 10]
       regressor__min_samples_leaf: [1, 2, 5]
@@ -181,30 +174,58 @@ model:
       regressor__n_jobs: [null]
 
     modelo_regressao_linear_ridge:
-      regressor__alpha: [0.01, 0.1, 1.0, 10.0, 100.0]
-      regressor__fit_intercept: [true, false]
+      regressor__alpha: [0.01, 0.1, 1.0, 10.0]
+      regressor__fit_intercept: [True, False]
       regressor__tol: [0.0001, 0.001, 0.01]
       regressor__solver: ['auto', 'svd', 'cholesky', 'saga']
-      regressor__positive: [true, false]
-      regressor__copy_X: [true, false]
+      regressor__positive: [True, False]
+      regressor__copy_X: [True, False]
 
     modelo_regressao_linear_lasso:
       regressor__alpha: [0.001, 0.01, 0.1, 1.0, 10.0]
-      regressor__fit_intercept: [true, false]
+      regressor__fit_intercept: [True, False]
       regressor__max_iter: [500, 1000, 5000, 10000]
       regressor__tol: [0.0001, 0.001, 0.01, 0.1]
-      regressor__positive: [true, false]
+      regressor__positive: [True, False]
 
     modelo_regressao_linear_elasticnet:
       regressor__alpha: [0.01, 0.1, 0.5, 1.0, 5.0]
       regressor__l1_ratio: [0.1, 0.3, 0.5, 0.7, 0.9]
-      regressor__fit_intercept: [true, false]
+      regressor__fit_intercept: [True, False]
       regressor__max_iter: [1000, 5000, 10000]
       regressor__tol: [0.0001, 0.001, 0.01]
-      regressor__positive: [true, false]
+      regressor__positive: [True, False]
       regressor__random_state: [42]
 
     modelo_regressao_polinomial:
-      regressor__degree: [2, 3, 4, 5]
-      regressor__interaction_only: [false, true]
-      regressor__include_bias: [false, true]
+      regressor_degree: [2.0, 3.0, 4.0, 5.0]
+      regressor_interaction_only: [False, True]
+      regressor_include_bias: [False, True]
+
+  param_grid_regressao_polinomial:
+    modelo_regressao_linear:
+      poly__degree: [2, 3]
+      poly__interaction_only: [False, True]
+      regressor__fit_intercept: [True, False]
+
+    modelo_regressao_linear_elasticnet:
+      poly__degree: [2, 3]
+      poly__interaction_only: [False, True]
+      regressor__alpha: [0.01, 0.1, 0.5]
+      regressor__l1_ratio: [0.3, 0.5, 0.7]
+      regressor__fit_intercept: [True, False]
+      regressor__tol: [0.0001, 0.001]
+
+    modelo_regressao_linear_lasso:
+      poly__degree: [2, 3]
+      poly__interaction_only: [False, True]
+      regressor__alpha: [0.01, 0.1, 0.5]
+      regressor__fit_intercept: [True, False]
+      regressor__tol: [0.0001, 0.001]
+
+    modelo_regressao_linear_ridge:
+      poly__degree: [1, 2, 3]
+      poly__interaction_only: [False, True]
+      regressor__alpha: [0.01, 0.1, 1.0, 10.0]
+      regressor__fit_intercept: [True, False]
+      regressor__tol: [0.0001, 0.001, 0.01]
