@@ -22,7 +22,7 @@ class Avaliador(ABC):
         pass
 
     @abstractmethod
-    def gerar_grafico_underfit_overfit(self, **kwargs):
+    def gerar_grafico_underfit_overfit(self, metricas: Dict[str, Any]):
         pass
 
     @abstractmethod
