@@ -1,3 +1,4 @@
+import logging
 import re
 from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
@@ -66,6 +67,43 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         self._avaliador = avaliador
 
     @staticmethod
+    def _extrair_transmissao(val):
+        val = str(val).lower()
+        if any(x in val for x in
+               ['aut.', 'automático', 'automatico', 's-tronic', 'tip.', 'tiptronic', 'dsg', 'cvt', 'powershift']):
+            return 'Automático'
+        else:
+            return 'Manual'
+
+    @staticmethod
+    def _extrair_turbo(val):
+        val = str(val).lower()
+
+
+        turbo_keywords = [
+            'turbo', 'tfsi', 'tsi', 't-jet',  # Termos Originais
+            'tb', 'biturbo', 'bi-turbo',  # Variações comuns
+            'kompressor', 'compressor',  # Sobrealimentação
+            'thp', 'tdi', 'cdi', 'cgi',  # Siglas de motores (Peugeot, VW/Audi, Mercedes)
+            'ecoboost', 't-gdi', 'tgdi',  # Ford, Hyundai/Kia
+            'jtd', 'hdi', 'd-4d', 'multijet',  # Diesel (Fiat, PSA, Toyota)
+            'bluetec', 'tce', 'di-d', 'crdi',  # Outras tecnologias
+            'duratorq', 'powerstroke',  # Pickups
+            't270', 't200', 'td350', 'td380'  # Siglas de Torque (Jeep/Fiat)
+        ]
+
+
+        if any(k in val for k in turbo_keywords):
+            return 'Sim'
+
+        # Verificação 2: Regex para padrões de cilindrada + T (ex: "2.0T", "1.8 T")
+        # \b = fronteira de palavra, \d = dígito, \s? = espaço opcional
+        if re.search(r'\b[0-9]\.[0-9]\s?t\b', val):
+            return 'Sim'
+
+        return 'Não'
+
+    @staticmethod
     def _extrair_motor(model_str: str):
 
         if pd.isna(model_str) or not isinstance(model_str, str):
@@ -77,7 +115,7 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         return None
 
     @staticmethod
-    def extrair_potencia(model_str: str):
+    def _extrair_potencia(model_str: str):
         match = re.search(r'(\d+)cv', str(model_str))
         if match:
             return int(match.group(1))
@@ -110,8 +148,9 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
     def _realizar_engenharia_atributos_df(self, dataframe: pd.DataFrame) -> pd.DataFrame:
 
         dataframe['motor_cilindrada'] = dataframe['modelo'].apply(self._extrair_motor)
-
         dataframe["ano_modelo"] = dataframe["ano_modelo"].replace(32000, 2026)
+        dataframe['tipo_transmissao'] = dataframe['modelo'].apply(self._extrair_transmissao)
+        dataframe['turbo'] = dataframe['modelo'].apply(self._extrair_turbo)
 
         return dataframe
 

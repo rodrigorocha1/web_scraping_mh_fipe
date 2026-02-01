@@ -76,7 +76,7 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
     def realizar_validacao_cruzada(
             self,
             x: pd.DataFrame,
-            y: pd.DataFrame,
+            y: pd.Series,
             iteracao: int
     ) -> Dict[str, Any]:
         assert self._pipeline is not None

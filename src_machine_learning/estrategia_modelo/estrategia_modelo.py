@@ -59,7 +59,7 @@ class EstrategiaModelo(ABC, Generic[PassosPipelineModelo, ResultadoBuscaT]):
     def realizar_validacao_cruzada(
             self,
             x: pd.DataFrame,
-            y: pd.DataFrame,
+            y: pd.Series,
             iteracao: int
     ) -> Dict[str, Any]:
         pass

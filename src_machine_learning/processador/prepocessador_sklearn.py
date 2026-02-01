@@ -63,6 +63,7 @@ class PrepocessadorSklearnn(Processador):
                 dataframe = self.abrir_dataframe()
                 dataframe = self.fazer_processamento(dataframe)
 
+
                 x_train, x_test, y_train, y_test = self._separar_treino_teste(dataframe=dataframe)
 
                 passos_pipeline = self._preparar_modelo()

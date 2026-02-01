@@ -25,7 +25,7 @@ from src_machine_learning.estrategia_modelo.estrategia_regressao_svr import Estr
 from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
 
 opcao = 1
-opcao_execucao = 3
+opcao_execucao = 1
 inicio_modelo = time.time()
 modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
     (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao=opcao)),
