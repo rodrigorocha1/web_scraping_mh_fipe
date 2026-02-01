@@ -30,10 +30,14 @@ modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
     (AvaliadorSVR(), EstrategiaRegressaoSVR()),
     (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural()),
     (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest()),
-    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(polinomial=True)),
+    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear()),
     (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso()),
     (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge()),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet())
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet()),
+    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(polinomial=True))
 ]
 opcao = 1
 for modelo in tqdm(

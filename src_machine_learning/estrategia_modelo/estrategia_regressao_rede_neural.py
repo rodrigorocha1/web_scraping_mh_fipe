@@ -25,5 +25,5 @@ class EstrategiaRegressaoRedeNeural(EstrategiaModeloSklearn):
                 transformer=StandardScaler()
             )),
             param_grid=self.PARAM_GRID,
-            polinomial=False
+            polinomial=polinomial
         )

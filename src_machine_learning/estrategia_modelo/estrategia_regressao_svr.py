@@ -20,5 +20,5 @@ class EstrategiaRegressaoSVR(EstrategiaModeloSklearn):
             )),
 
             param_grid=self.PARAM_GRID,
-            polinomial=False
+            polinomial=polinomial
         )
