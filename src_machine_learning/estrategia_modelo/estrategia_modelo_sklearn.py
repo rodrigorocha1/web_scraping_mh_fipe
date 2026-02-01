@@ -51,6 +51,7 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
 
         pipeline = Pipeline(self._pipeline)
 
+
         grid_search = GridSearchCV(
             estimator=pipeline,
             param_grid=self.__PARAM_GRID,
@@ -58,7 +59,8 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
             cv=5,
             n_jobs=-1,
             verbose=1,
-            return_train_score=True
+            return_train_score=True,
+
         )
 
         grid_search.fit(x, y)

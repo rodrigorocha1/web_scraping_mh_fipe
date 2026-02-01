@@ -11,7 +11,7 @@ from sklearn.model_selection import GridSearchCV, validation_curve
 from sklearn.pipeline import Pipeline
 from sklearn.tree import export_text, DecisionTreeRegressor
 
-from src.avaliador.avaliador import Avaliador
+from src_machine_learning.avaliador.avaliador import Avaliador
 
 
 class AvaliadorFlorestaAleatoria(Avaliador):
