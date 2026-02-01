@@ -23,22 +23,23 @@ from src_machine_learning.estrategia_modelo.estrategia_regressao_random_florest 
 from src_machine_learning.estrategia_modelo.estrategia_regressao_rede_neural import EstrategiaRegressaoRedeNeural
 from src_machine_learning.estrategia_modelo.estrategia_regressao_svr import EstrategiaRegressaoSVR
 from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
+
 opcao = 2
 opcao_execucao = 2
 inicio_modelo = time.time()
 modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
-    # (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao = opcao)),
-    # (AvaliadorSVR(), EstrategiaRegressaoSVR(opcao = opcao)),
-    # (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural(opcao = opcao)),
-    # (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest(opcao = opcao)),
+    (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao=opcao)),
+    (AvaliadorSVR(), EstrategiaRegressaoSVR(opcao=opcao)),
+    (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural(opcao=opcao)),
+    (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest(opcao=opcao)),
     (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao=opcao)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(opcao = opcao)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao = opcao)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao = opcao)),
-    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao = opcao, polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(opcao=opcao)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao=opcao)),
+    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao=opcao, polinomial=True)),
     (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao = opcao,polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao = opcao, polinomial=True))
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao, polinomial=True)),
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao=opcao, polinomial=True))
 ]
 
 inicio_total = time.time()  # tempo total do script
