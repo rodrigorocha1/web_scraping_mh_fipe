@@ -98,13 +98,15 @@ class PrepocessadorSklearnn(Processador):
                 salvar_json(
                     dados=resultado_previsoes_modelo_simples,
                     diretorio=f'dados/resultado_previsoes_modelo_simples/{resultado}',
-                    nome_arquivo=f'resultado_previsoes_modelo_simples_{resultado}'
+                    nome_arquivo=f'resultado_previsoes_modelo_simples_{resultado}',
+                    identacao=4
 
                 )
                 salvar_json(
                     dados=dados,
                     diretorio=f'dados/avaliador_modelo/{resultado}',
-                    nome_arquivo=f'avaliador_modelo_{resultado}'
+                    nome_arquivo=f'avaliador_modelo_{resultado}',
+                    identacao=4
 
                 )
                 dados['nome_modelo'] = resultado
@@ -139,7 +141,8 @@ class PrepocessadorSklearnn(Processador):
                 salvar_json(
                     dados=resultado_grid,
                     diretorio=f'dados/resultado_turing_parametros/{nome_modelo}',
-                    nome_arquivo=f'resultado_turing_parametros_{nome_modelo}'
+                    nome_arquivo=f'resultado_turing_parametros_{nome_modelo}',
+                    identacao=4
 
                 )
             case 3:

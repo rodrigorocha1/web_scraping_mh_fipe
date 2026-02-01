@@ -39,8 +39,8 @@ def converter_numpy_para_list(obj):
         return obj
 
 
-def salvar_json(dados: Dict[str, Any], diretorio: str, nome_arquivo: str):
+def salvar_json(dados: Dict[str, Any], diretorio: str, nome_arquivo: str, identacao: int = None):
     caminho_completo = os.path.join(os.getcwd(), diretorio, f'{nome_arquivo}.jsonl')
     dados_serializaveis = converter_numpy_para_list(dados)
     with open(caminho_completo, 'a', encoding='utf-8') as json_file:
-        json_file.write(json.dumps(dados, ensure_ascii=False) + '\n')
+        json_file.write(json.dumps(dados, ensure_ascii=False, indent=identacao) + '\n')
