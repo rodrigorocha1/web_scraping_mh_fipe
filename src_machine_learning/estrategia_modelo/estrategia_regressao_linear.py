@@ -23,7 +23,7 @@ class EstrategiaRegressaoLinear(EstrategiaModeloSklearn):
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
             modelo=('regressor', self.modelo),
-            param_grid=self.PARAM_POLINOMIAL if self.polinomial else self.PARAM_GRID,
+            param_grid=self.PARAM_POLINOMIAL if polinomial else self.PARAM_GRID,
             modelo_polinomial=("poly", PolynomialFeatures()),
             polinomial=polinomial
         )

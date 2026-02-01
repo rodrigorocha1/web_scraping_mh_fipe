@@ -252,13 +252,13 @@ model:
       random_state: [ 42.0 ]
 
     modelo_regressao_polinomial: #9
-      regressor_degree: [ 2.0, 3.0, 4.0, 5.0 ],
+      regressor_degree: [ 2.0, 3.0, 4.0, 5.0 ]
       regressor_interaction_only': [ False, True ]
       regressor_include_bias': [ False, True ]
 
   param_grid_regressao_polinomial:
     modelo_regressao_linear: #0
-      poly__degree: [ 2.0, 3.0 ],
+      poly__degree: [ 2.0, 3.0 ]
       poly__interaction_only: [ False, True ]
       regressor__fit_intercept: [ True, False ]
 
