@@ -165,13 +165,14 @@ class PrepocessadorSklearnn(Processador):
                 dataframe = self.abrir_dataframe()
                 dataframe = self.fazer_processamento(dataframe)
                 x_train, x_test, y_train, y_test = self._separar_treino_teste(dataframe=dataframe)
-                x_trains = x_train.to_numpy()
-                x_tests = x_test.to_numpy()
-                y_trains = y_train.to_numpy()
-                y_tests = y_test.to_numpy()
+                # x_trains = x_train.to_numpy()
+                # x_tests = x_test.to_numpy()
+                # y_trains = y_train.to_numpy()
+                # y_tests = y_test.to_numpy()
 
-                x_completo = np.concatenate((x_trains, x_tests), axis=0)
-                y_completo = np.concatenate((y_trains, y_tests), axis=0)
+                x_completo = pd.concat((x_train, x_test), axis=0)
+                y_completo = pd.concat((y_train, y_test), axis=0)
+                print(x_completo)
                 passos_pipeline = self._preparar_modelo()
                 self._estrategia_modelo.pipeline = passos_pipeline
 

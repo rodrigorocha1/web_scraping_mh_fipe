@@ -24,8 +24,8 @@ from src_machine_learning.estrategia_modelo.estrategia_regressao_rede_neural imp
 from src_machine_learning.estrategia_modelo.estrategia_regressao_svr import EstrategiaRegressaoSVR
 from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
 
-opcao = 2
-opcao_execucao = 2
+opcao = 1
+opcao_execucao = 3
 inicio_modelo = time.time()
 modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
     (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao=opcao)),
@@ -36,10 +36,10 @@ modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
     (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(opcao=opcao)),
     (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao)),
     (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao=opcao)),
-    (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao=opcao, polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao, polinomial=True)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao=opcao, polinomial=True))
+    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao=opcao, polinomial=True)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao, polinomial=True)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao=opcao, polinomial=True))
 ]
 
 inicio_total = time.time()  # tempo total do script

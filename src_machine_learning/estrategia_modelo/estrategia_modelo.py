@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from typing import Dict, Any, TypeVar, Generic, Optional, List
 
 import numpy as np
+import pandas as pd
 from pandas import DataFrame, Series
 from sklearn.pipeline import Pipeline
 
@@ -17,6 +18,7 @@ class EstrategiaModelo(ABC, Generic[PassosPipelineModelo, ResultadoBuscaT]):
         self._polinomial = polinomial
 
         self._dados_treinamento: Optional[Pipeline] = None
+
     @property
     def polinomial(self):
         return self._polinomial
@@ -56,8 +58,8 @@ class EstrategiaModelo(ABC, Generic[PassosPipelineModelo, ResultadoBuscaT]):
     @abstractmethod
     def realizar_validacao_cruzada(
             self,
-            x: np.ndarray[Any],
-            y: np.ndarray[Any],
+            x: pd.DataFrame,
+            y: pd.DataFrame,
             iteracao: int
     ) -> Dict[str, Any]:
         pass
