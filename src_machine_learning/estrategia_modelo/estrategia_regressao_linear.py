@@ -14,7 +14,7 @@ class EstrategiaRegressaoLinear(EstrategiaModeloSklearn):
     PARAM_GRID: Final[Dict[str, Any]] = carregar_dados_yaml_lista(parametro_modelo='parametros_grid')[5][
         'parametros']  # trazer do arquivo yaml
     PARAM_POLINOMIAL: Final[Dict[str, Any]] = \
-        carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[9][
+        carregar_dados_yaml_lista(parametro_modelo='param_grid_regressao_polinomial')[0][
             'parametros']
 
     modelo = LinearRegression(**PARAM_MODELO_REGRESSAO)
@@ -23,7 +23,7 @@ class EstrategiaRegressaoLinear(EstrategiaModeloSklearn):
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
             modelo=('regressor', self.modelo),
-            param_grid=self.PARAM_GRID,
-            modelo_polinomial=("poly", PolynomialFeatures(**self.PARAM_POLINOMIAL)),
+            param_grid=self.PARAM_POLINOMIAL if self.polinomial else self.PARAM_GRID,
+            modelo_polinomial=("poly", PolynomialFeatures()),
             polinomial=polinomial
         )

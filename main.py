@@ -6,9 +6,13 @@ from typing import List, Tuple
 from tqdm import tqdm
 
 from src_machine_learning.avaliador.avaliador import Avaliador
+from src_machine_learning.avaliador.avaliador_regressao_linear import AvaliadorRegressaoLinear
 from src_machine_learning.avaliador.avaliador_regressao_linear_regularizada import AvaliadorRegressaoLinearRegularizada
 from src_machine_learning.estrategia_modelo.estrategia_modelo import EstrategiaModelo
+from src_machine_learning.estrategia_modelo.estrategia_regressao_linear import EstrategiaRegressaoLinear
 from src_machine_learning.estrategia_modelo.estrategia_regressao_linear_elastic_net import EstrategiaRegressaoElasticNet
+from src_machine_learning.estrategia_modelo.estrategia_regressao_linear_lasso import EstrategiaRegressaoLinearLasso
+from src_machine_learning.estrategia_modelo.estrategia_regressao_linear_ridge import EstrategiaRegressaoLinearRidge
 from src_machine_learning.processador.prepocessador_sklearn import PrepocessadorSklearnn
 
 inicio_modelo = time.time()
@@ -17,10 +21,10 @@ modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
     # (AvaliadorSVR(), EstrategiaRegressaoSVR()),
     # (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural()),
     # (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest()),
-    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear()),
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso())
-    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge())
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet())
+    # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(polinomial=True)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True))
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(polinomial=True))
+    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(polinomial=True))
 ]
 opcao = 1
 for modelo in tqdm(

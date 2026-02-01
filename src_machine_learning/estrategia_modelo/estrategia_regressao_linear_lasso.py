@@ -15,14 +15,14 @@ class EstrategiaRegressaoLinearLasso(EstrategiaModeloSklearn):
         'parametros']  # trazer do arquivo yaml
     modelo = Lasso(**PARAM_MODELO_REGRESSAO)
     PARAM_POLINOMIAL: Final[Dict[str, Any]] = \
-        carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[9][
+        carregar_dados_yaml_lista(parametro_modelo='param_grid_regressao_polinomial')[2][
             'parametros']
 
     def __init__(self, polinomial: bool = False):
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
             modelo=('regressor', self.modelo),
-            param_grid=self.PARAM_GRID,
+            param_grid=self.PARAM_POLINOMIAL if self.polinomial else self.PARAM_GRID,
             modelo_polinomial=("poly", PolynomialFeatures(**self.PARAM_POLINOMIAL)),
             polinomial=polinomial
         )

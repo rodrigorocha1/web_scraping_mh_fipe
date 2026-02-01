@@ -36,10 +36,10 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
 
         assert self._pipeline is not None
 
-        self._pipeline.append(self.__modelo)
+
         if self._polinomial:
             self._pipeline.append(self.__modelo_polinomial)
-
+        self._pipeline.append(self.__modelo)
         self._dados_treinamento = Pipeline(steps=self._pipeline)
 
         self._dados_treinamento.fit(x, y)
@@ -52,10 +52,10 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
             self, x: DataFrame, y: Series
     ) -> GridSearchCV:
         assert self._pipeline is not None
-        self._pipeline.append(self.__modelo)
+
         if self._polinomial:
             self._pipeline.append(self.__modelo_polinomial)
-
+        self._pipeline.append(self.__modelo)
         pipeline = Pipeline(self._pipeline)
 
 

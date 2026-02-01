@@ -4,6 +4,7 @@ from typing import Dict, Any
 
 import matplotlib.pyplot as plt
 import numpy as np
+import sklearn
 from pandas import Series, DataFrame
 from sklearn.metrics import (
     mean_absolute_error,
@@ -31,10 +32,10 @@ class AvaliadorRegressaoLinearRegularizada(Avaliador):
     # Curva de validação (Bias vs Variance)
     # ==========================================================
     def obter_dados_curva_validacao(
-        self,
-        pipeline: Pipeline,
-        X_train: DataFrame,
-        y_train: Series,
+            self,
+            pipeline: Pipeline,
+            X_train: DataFrame,
+            y_train: Series,
     ) -> Dict[str, Any]:
 
         regressor = pipeline.named_steps["regressor"]
@@ -68,14 +69,20 @@ class AvaliadorRegressaoLinearRegularizada(Avaliador):
             "best_rmse": float(val_rmse[best_idx]),
         }
 
-    # ==========================================================
-    # Métricas finais
-    # ==========================================================
+    @staticmethod
+    def __obter_nomes_features(pipeline: sklearn.pipeline.Pipeline) -> list[str]:
+        preprocessor = pipeline.named_steps["preprocessor"]
+
+        if hasattr(preprocessor, "get_feature_names_out"):
+            return list(preprocessor.get_feature_names_out())
+
+        raise ValueError("Preprocessor não expõe get_feature_names_out")
+
     def obter_resultados_modelo(
-        self,
-        pipeline: Pipeline,
-        y_test: Series,
-        y_pred: np.ndarray,
+            self,
+            pipeline: Pipeline,
+            y_test: Series,
+            y_pred: np.ndarray,
     ) -> Dict[str, Any]:
 
         regressor = pipeline.named_steps["regressor"]
@@ -100,10 +107,11 @@ class AvaliadorRegressaoLinearRegularizada(Avaliador):
         )
         acc_10 = float(np.mean(erro_pct <= 0.10))
 
+        nomes_features = self.__obter_nomes_features(pipeline)
         coeficientes = {
-            int(i): float(v) for i, v in enumerate(regressor.coef_)
+            nome: float(coef)
+            for nome, coef in zip(nomes_features, regressor.coef_)
         }
-
         resultado = {
             # Métricas
             "mae": float(mae),
@@ -125,7 +133,6 @@ class AvaliadorRegressaoLinearRegularizada(Avaliador):
             "intercepto": float(regressor.intercept_),
             "coeficientes": coeficientes,
         }
-
 
         if hasattr(regressor, "l1_ratio"):
             resultado["l1_ratio"] = float(regressor.l1_ratio)
@@ -161,9 +168,8 @@ class AvaliadorRegressaoLinearRegularizada(Avaliador):
         )
         plt.close()
 
-
     def obter_resultado_grid_search(
-        self, grid_search: GridSearchCV
+            self, grid_search: GridSearchCV
     ) -> Dict[str, Any]:
 
         assert grid_search is not None, "GridSearchCV não foi executado"

@@ -74,6 +74,10 @@ class PrepocessadorSklearnn(Processador):
 
                 previsoes = self._estrategia_modelo.predizer_modelo(x_test=x_test)
 
+                flag_polinomial = self._estrategia_modelo.polinomial
+                if flag_polinomial:
+                    resultado = f'{resultado}_polinomial'
+
                 dados = self._avaliador.obter_dados_curva_validacao(
                     pipeline=pipeline,
                     y_train=y_train,
