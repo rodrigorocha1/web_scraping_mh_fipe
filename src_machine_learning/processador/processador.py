@@ -3,6 +3,11 @@ from abc import ABC, abstractmethod
 from typing import TypeVar, Generic
 
 import pandas as pd
+from sklearn.model_selection import train_test_split
+
+from src_machine_learning.avaliador.avaliador import Avaliador
+from src_machine_learning.config.variaveis import SeparacaoTreinoTeste
+from src_machine_learning.estrategia_modelo.estrategia_modelo import EstrategiaModelo
 
 pd.set_option("display.max_rows", 200)  # linhas máximas
 pd.set_option("display.max_columns", 1000)  # colunas máximas
@@ -15,7 +20,7 @@ ModeloMachineLearning = TypeVar('ModeloMachineLearning')
 
 class Processador(ABC, Generic[ModeloMachineLearning]):
 
-    def __init__(self):
+    def __init__(self, estratregia_modelo: EstrategiaModelo, avaliador: Avaliador):
         self.__caminho_arquivo = "tabela-fipe-329.csv"
         self.__marcas_ids = [
             6,  # Audi
@@ -55,8 +60,10 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
             'Price': 'preco',
 
         }
-        self._features_numericas = ['preco', 'motor_cilindrada', 'ano_modelo']
+        self._features_numericas = [ 'motor_cilindrada', 'ano_modelo']
         self._features_categoricas = ['marca', 'modelo', 'tipo_combustivel']
+        self._estrategia_modelo = estratregia_modelo
+        self._avaliador = avaliador
 
     @staticmethod
     def _extrair_motor(model_str: str):
@@ -89,25 +96,41 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         dataframe['preco'] = dataframe['preco'].str.replace(',', '.', regex=False)
         dataframe['preco'] = pd.to_numeric(dataframe['preco'])
         dataframe = dataframe[dataframe['preco'] <= 500000.00]
-        dataframe[self._colunas_categoricas] = dataframe[self._colunas_categoricas].astype('category')
-        return dataframe
-
-    def _realizar_engenharia_atributos_df(self, dataframe: pd.DataFrame) -> pd.DataFrame:
-        print(dataframe)
-        dataframe['motor_cilindrada'] = dataframe['modelo'].apply(self._extrair_motor)
         dataframe['ano_modelo'] = dataframe['codigo_ano'].str.split('-').str[0].astype(int)
         dataframe = dataframe[dataframe['ano_modelo'] >= 2000]
+        dataframe[self._colunas_categoricas] = dataframe[self._colunas_categoricas].astype('category')
         dataframe.drop(
             columns=['tipo', 'codigo_marca', 'codigo_modelo', 'codigo_ano',
                      'ano_combustivel', 'codigo_fipe', 'sigla_combustivel', 'Month'],
             inplace=True
         )
+
         return dataframe
 
+    def _realizar_engenharia_atributos_df(self, dataframe: pd.DataFrame) -> pd.DataFrame:
+
+        dataframe['motor_cilindrada'] = dataframe['modelo'].apply(self._extrair_motor)
+
+        dataframe["ano_modelo"] = dataframe["ano_modelo"].replace(32000, 2026)
+
+        return dataframe
+
+    @staticmethod
+    def _separar_treino_teste(dataframe: pd.DataFrame) -> SeparacaoTreinoTeste:
+        x = dataframe.drop(columns=['preco'])
+        y = dataframe['preco']
+        x_train, x_test, y_train, y_test = train_test_split(
+            x,
+            y,
+            test_size=0.3,
+            random_state=42
+        )
+        return x_train, x_test, y_train, y_test
+
     @abstractmethod
-    def executar(self) -> ModeloMachineLearning:
+    def executar(self, opcao: int) -> ModeloMachineLearning:
         pass
 
     @abstractmethod
-    def preparar_modelo(self, **kwargs) -> ModeloMachineLearning:
+    def _preparar_modelo(self, **kwargs) -> ModeloMachineLearning:
         pass
