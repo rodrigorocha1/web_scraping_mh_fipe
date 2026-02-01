@@ -15,7 +15,7 @@ class EstrategiaRegressaoRedeNeural(EstrategiaModeloSklearn):
     PARAM_GRID: Final[Dict[str, Any]] = carregar_dados_yaml_lista(parametro_modelo='parametros_grid')[2][
         'parametros']  # trazer do arquivo yaml
 
-    def __init__(self, ):
+    def __init__(self, polinomial: bool = False ):
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
             modelo=('regressor', TransformedTargetRegressor(
@@ -24,5 +24,6 @@ class EstrategiaRegressaoRedeNeural(EstrategiaModeloSklearn):
                 ),
                 transformer=StandardScaler()
             )),
-            param_grid=self.PARAM_GRID
+            param_grid=self.PARAM_GRID,
+            polinomial=False
         )

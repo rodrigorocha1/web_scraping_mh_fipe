@@ -1,6 +1,6 @@
 from typing import Final, Dict, Any
 
-from sklearn.linear_model import Ridge, Lasso
+from sklearn.linear_model import Lasso
 from sklearn.preprocessing import PolynomialFeatures
 
 from src_machine_learning.estrategia_modelo.estrategia_modelo_sklearn import EstrategiaModeloSklearn
@@ -18,11 +18,11 @@ class EstrategiaRegressaoLinearLasso(EstrategiaModeloSklearn):
         carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[9][
             'parametros']
 
-
-    def __init__(self):
+    def __init__(self, polinomial: bool = False):
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
             modelo=('regressor', self.modelo),
             param_grid=self.PARAM_GRID,
-            modelo_polinomial=("poly", PolynomialFeatures(**self.PARAM_POLINOMIAL))
+            modelo_polinomial=("poly", PolynomialFeatures(**self.PARAM_POLINOMIAL)),
+            polinomial=polinomial
         )

@@ -13,10 +13,11 @@ class EstrategiaRegressaoRandomFlorest(EstrategiaModeloSklearn):
     PARAM_GRID: Final[Dict[str, Any]] = carregar_dados_yaml_lista(parametro_modelo='parametros_grid')[4][
         'parametros']  # trazer do arquivo yaml
 
-    def __init__(self, ):
+    def __init__(self, polinomial: bool = False):
         super().__init__(
             modelo=('regressor', RandomForestRegressor(**self.PARAM_MODELO_REGRESSAO)),
             param_grid=self.PARAM_GRID,
-            param_modelo_regressao=self.PARAM_MODELO_REGRESSAO
+            param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
+            polinomial=polinomial
 
         )

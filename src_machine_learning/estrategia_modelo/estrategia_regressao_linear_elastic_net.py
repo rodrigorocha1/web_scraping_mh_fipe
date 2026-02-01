@@ -19,10 +19,11 @@ class EstrategiaRegressaoElasticNet(EstrategiaModeloSklearn):
             'parametros']
     modelo = ElasticNet(**PARAM_MODELO_REGRESSAO)
 
-    def __init__(self):
+    def __init__(self, polinomial: bool = False):
         super().__init__(
             param_modelo_regressao=self.PARAM_MODELO_REGRESSAO,
             modelo=('regressor', self.modelo),
             param_grid=self.PARAM_GRID,
-            modelo_polinomial=("poly", PolynomialFeatures(**self.PARAM_POLINOMIAL))
+            modelo_polinomial=("poly", PolynomialFeatures(**self.PARAM_POLINOMIAL)),
+            polinomial=polinomial
         )
