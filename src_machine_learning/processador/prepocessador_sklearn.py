@@ -1,3 +1,4 @@
+import os
 import re
 from datetime import datetime
 from src_machine_learning.utils.utils import salvar_json
@@ -70,11 +71,15 @@ class PrepocessadorSklearnn(Processador):
                 parte = re.sub(r'^Estrategia', '', texto)
                 resultado = re.sub(r'(?<!^)([A-Z])', r'_\1', parte).lower()
 
-                print(resultado)
+
+                os.makedirs(name=f'fig/gerar_grafico_over_under/{resultado}/', exist_ok=True)
+                os.makedirs(name=f'dados/avaliador_modelo/{resultado}/', exist_ok=True)
                 salvar_json(
                     dados=dados,
                     diretorio=f'dados/avaliador_modelo/{resultado}',
                     nome_arquivo=f'avaliador_modelo_{resultado}'
 
                 )
+                dados['nome_modelo'] = resultado
+
                 self._avaliador.gerar_grafico_underfit_overfit(dados)

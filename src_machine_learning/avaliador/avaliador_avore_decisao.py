@@ -251,7 +251,7 @@ class AvaliadorArvoreDecisao(Avaliador):
         plt.grid(True)
         plt.tight_layout()
         plt.savefig(
-            f'fig/gerar_grafico_over_under/arvore_decisao/gerar_grafico_underfit_overfit_over_under_av_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png')
+            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_over_under_av_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png')
         plt.close()
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:
