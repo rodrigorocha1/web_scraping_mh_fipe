@@ -17,9 +17,6 @@ class EstrategiaRegressaoLinear(EstrategiaModeloSklearn):
         carregar_dados_yaml_lista(parametro_modelo='param_grid_regressao_polinomial')[0][
             'parametros']
 
-    modelo = LinearRegression(**PARAM_MODELO_REGRESSAO)
-    print('*****************************')
-    print(PARAM_GRID)
 
     def __init__(self, polinomial: bool = False, opcao: int = 1):
         self.__opcao = opcao
