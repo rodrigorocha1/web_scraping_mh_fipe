@@ -127,10 +127,15 @@ model:
   #        rate_drop: 0.0
   #        skip_drop: 0.0
     regressao_linear: # 6
+      fit_intercept: True
+      positive: False
 
     regressao_linear_ridge: #7
+       regressor__alpha: [ 0.01, 0.1, 1.0, 10.0, 100.0 ]
+       regressor__fit_intercept': [ True, False ]
 
     regressao_linear_lasso: #8
+        regressor__alpha': [0.001, 0.01, 0.1, 1.0, 10.0]
 
 
 
@@ -191,10 +196,15 @@ model:
 
 
     modelo_regressao_linear: #6
+      regressor__fit_intercept': [ True, False ]
+      regressor__positive': [ True, False ]
 
     modelo_regressao_linear_ridge: #7
+      regressor__alpha: [ 0.01, 0.1, 1.0, 10.0, 100.0 ]
+      regressor__fit_intercept': [ True, False ]
 
     modelo_regressao_linear_lasso: #8
+      regressor__alpha': [0.001, 0.01, 0.1, 1.0, 10.0]
 
   parametros_producao:
     random_forest:

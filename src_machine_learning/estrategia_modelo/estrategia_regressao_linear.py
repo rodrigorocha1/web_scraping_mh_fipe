@@ -9,11 +9,13 @@ from src_machine_learning.utils.utils import carregar_dados_yaml_lista
 
 class EstrategiaRegressaoLinear(EstrategiaModeloSklearn):
     PARAM_MODELO_REGRESSAO: Final[Dict[str, Any]] = \
-        carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[1][
+        carregar_dados_yaml_lista(parametro_modelo='parametros_treinamento_simples')[5][
             'parametros']  # trazer do arquivo yaml
-    PARAM_GRID: Final[Dict[str, Any]] = carregar_dados_yaml_lista(parametro_modelo='parametros_grid')[6][
+    PARAM_GRID: Final[Dict[str, Any]] = carregar_dados_yaml_lista(parametro_modelo='parametros_grid')[5][
         'parametros']  # trazer do arquivo yaml
+    print(PARAM_MODELO_REGRESSAO)
     modelo = LinearRegression(**PARAM_MODELO_REGRESSAO)
+
 
     def __init__(self):
         super().__init__(

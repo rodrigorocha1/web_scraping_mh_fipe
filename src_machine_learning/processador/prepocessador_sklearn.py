@@ -79,21 +79,29 @@ class PrepocessadorSklearnn(Processador):
                     y_train=y_train,
                     X_train=x_train
                 )
+                os.makedirs(name=f'fig/gerar_grafico_over_under/{resultado}/', exist_ok=True)
+                if dados is not None:
+                    dados['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+                    os.makedirs(name=f'dados/avaliador_modelo/{resultado}/', exist_ok=True)
+                    salvar_json(
+                        dados=dados,
+                        diretorio=f'dados/avaliador_modelo/{resultado}',
+                        nome_arquivo=f'avaliador_modelo_{resultado}',
+                        identacao=4
+
+                    )
+                    dados['nome_modelo'] = resultado
+
+                    self._avaliador.gerar_grafico_underfit_overfit(dados)
+
                 resultado_previsoes_modelo_simples = self._avaliador.obter_resultados_modelo(
                     pipeline=pipeline,
                     y_test=y_test,
                     y_pred=previsoes
                 )
 
-                dados['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
+
                 resultado_previsoes_modelo_simples['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-                texto = self._estrategia_modelo.__class__.__name__
-                parte = re.sub(r'^Estrategia', '', texto)
-                resultado = re.sub(r'(?<!^)([A-Z])', r'_\1', parte).lower()
-
-                os.makedirs(name=f'fig/gerar_grafico_over_under/{resultado}/', exist_ok=True)
-                os.makedirs(name=f'dados/avaliador_modelo/{resultado}/', exist_ok=True)
                 os.makedirs(name=f'dados/resultado_previsoes_modelo_simples/{resultado}/', exist_ok=True)
                 salvar_json(
                     dados=resultado_previsoes_modelo_simples,
@@ -102,16 +110,7 @@ class PrepocessadorSklearnn(Processador):
                     identacao=4
 
                 )
-                salvar_json(
-                    dados=dados,
-                    diretorio=f'dados/avaliador_modelo/{resultado}',
-                    nome_arquivo=f'avaliador_modelo_{resultado}',
-                    identacao=4
 
-                )
-                dados['nome_modelo'] = resultado
-
-                self._avaliador.gerar_grafico_underfit_overfit(dados)
             case 2:
 
                 texto = self._estrategia_modelo.__class__.__name__
