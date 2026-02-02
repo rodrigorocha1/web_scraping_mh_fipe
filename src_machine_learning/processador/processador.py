@@ -46,7 +46,7 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
             57,  # Troller
             58  # Volvo
         ]
-        self._colunas_categoricas = ['codigo_marca', 'marca', 'sigla_combustivel', 'tipo_combustivel', 'tipo_transmissao', 'turbo']
+        self._colunas_categoricas = ['marca', 'tipo_combustivel', 'tipo_transmissao', 'turbo']
         self._colunas_rename = {
             'Type': 'tipo',
             'Brand_Code': 'codigo_marca',
@@ -136,7 +136,7 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         dataframe = dataframe[dataframe['preco'] <= 500000.00]
         dataframe['ano_modelo'] = dataframe['codigo_ano'].str.split('-').str[0].astype(int)
         dataframe = dataframe[dataframe['ano_modelo'] >= 2000]
-        dataframe[self._colunas_categoricas] = dataframe[self._colunas_categoricas].astype('category')
+
         dataframe.drop(
             columns=['tipo', 'codigo_marca', 'codigo_modelo', 'codigo_ano',
                      'ano_combustivel', 'codigo_fipe', 'sigla_combustivel', 'Month'],
@@ -151,6 +151,7 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
         dataframe["ano_modelo"] = dataframe["ano_modelo"].replace(32000, 2026)
         dataframe['tipo_transmissao'] = dataframe['modelo'].apply(self._extrair_transmissao)
         dataframe['turbo'] = dataframe['modelo'].apply(self._extrair_turbo)
+        dataframe[self._colunas_categoricas] = dataframe[self._colunas_categoricas].astype('category')
 
         return dataframe
 
