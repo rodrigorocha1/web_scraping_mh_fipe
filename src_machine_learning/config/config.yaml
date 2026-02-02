@@ -19,17 +19,17 @@ model:
     random_forest:
       random_state: 42
       min_samples_leaf: 1
-      min_samples_split: 10
-      criterion: friedman_mse
-      ccp_alpha: 0.0
+      min_samples_split: 5
+      criterion: squared_error
+      ccp_alpha: 0.01
       max_features: null
-      max_depth: 20
+      max_depth: null
 
     arvore_decisao:
       random_state: 42
       min_samples_leaf: 2
       min_samples_split: 10
-      criterion: squared_error
+      criterion: friedman_mse
       ccp_alpha: 0.0
       max_depth: null
       max_features: null
@@ -37,9 +37,9 @@ model:
 
     regressao_svr:
       kernel: rbf
-      C: 50
+      C: 150
       gamma: scale
-      epsilon: 0.1
+      epsilon: 0.05
 
     regressao_rede_neural:
       hidden_layer_sizes: [100, 50]
@@ -89,7 +89,7 @@ model:
       interaction_constraints: null
 
     regressao_linear:
-      fit_intercept: True
+      fit_intercept: False
       positive: False
       copy_X : True
       n_jobs: null
@@ -97,16 +97,16 @@ model:
     regressao_linear_ridge:
       alpha: 1.0
       fit_intercept: True
-      max_iter: 500
+      max_iter: 5000
       positive: False
       tol: 0.0001
       random_state: 42
 
 
     regressao_linear_lasso:
-      alpha: 0.001
+      alpha: 0.01
       fit_intercept: False
-      max_iter: 500
+      max_iter: 5000
       tol: 0.01
       random_state: 42
       positive: True
@@ -114,7 +114,7 @@ model:
     regressao_linear_elastic_net:
       alpha: 0.001
       fit_intercept: True
-      max_iter: 500
+      max_iter: 5000
       positive: False
       tol: 0.0001
 
@@ -176,28 +176,23 @@ model:
       regressor__n_jobs: [null]
 
     modelo_regressao_linear_ridge:
-      regressor__alpha: [0.01, 0.1, 1.0, 10.0]
-      regressor__fit_intercept: [True, False]
-      regressor__tol: [0.0001, 0.001, 0.01]
-      regressor__solver: ['auto', 'svd', 'cholesky', 'saga']
-      regressor__positive: [True, False]
-      regressor__copy_X: [True, False]
+      regressor__alpha: [ 0.1, 1.0, 10.0, 100.0 ]
+      regressor__fit_intercept: [ True ]
+      regressor__solver: [ 'auto', 'cholesky' ]
 
     modelo_regressao_linear_lasso:
-      regressor__alpha: [0.001, 0.01, 0.1, 1.0, 10.0]
-      regressor__fit_intercept: [True, False]
-      regressor__max_iter: [500, 1000, 5000, 10000]
-      regressor__tol: [0.0001, 0.001, 0.01, 0.1]
-      regressor__positive: [True, False]
+      regressor__alpha: [ 0.01, 0.1, 1.0 ]
+      regressor__fit_intercept: [ True ]
+      regressor__max_iter: [ 5000 ]
+      regressor__tol: [ 0.001 ]
 
     modelo_regressao_linear_elasticnet:
-      regressor__alpha: [0.01, 0.1, 0.5, 1.0, 5.0]
-      regressor__l1_ratio: [0.1, 0.3, 0.5, 0.7, 0.9]
-      regressor__fit_intercept: [True, False]
-      regressor__max_iter: [1000, 5000, 10000]
-      regressor__tol: [0.0001, 0.001, 0.01]
-      regressor__positive: [True, False]
-      regressor__random_state: [42]
+      regressor__alpha: [ 0.1, 1.0, 10.0 ]
+      regressor__l1_ratio: [ 0.2, 0.5, 0.8 ]
+      regressor__fit_intercept: [ True ]
+      regressor__max_iter: [ 5000 ]
+      regressor__tol: [ 0.001 ]
+      regressor__random_state: [ 42 ]
 
     modelo_regressao_polinomial:
       regressor_degree: [2.0, 3.0, 4.0, 5.0]

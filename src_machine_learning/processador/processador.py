@@ -62,7 +62,7 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
 
         }
         self._features_numericas = [ 'motor_cilindrada', 'ano_modelo']
-        self._features_categoricas = ['marca', 'modelo', 'tipo_combustivel']
+        self._features_categoricas = ['marca', 'modelo', 'tipo_combustivel','tipo_transmissao', 'turbo']
         self._estrategia_modelo = estratregia_modelo
         self._avaliador = avaliador
 
