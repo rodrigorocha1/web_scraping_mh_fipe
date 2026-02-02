@@ -46,7 +46,7 @@ class Processador(ABC, Generic[ModeloMachineLearning]):
             57,  # Troller
             58  # Volvo
         ]
-        self._colunas_categoricas = ['codigo_marca', 'marca', 'sigla_combustivel', 'tipo_combustivel']
+        self._colunas_categoricas = ['codigo_marca', 'marca', 'sigla_combustivel', 'tipo_combustivel', 'tipo_transmissao', 'turbo']
         self._colunas_rename = {
             'Type': 'tipo',
             'Brand_Code': 'codigo_marca',
