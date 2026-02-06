@@ -44,7 +44,7 @@ class EstrategiaModelo(ABC, Generic[PassosPipelineModelo, ResultadoBuscaT]):
         pass
 
     @abstractmethod
-    def predizer_modelo(self, x_test: DataFrame) -> np.ndarray[Any]:
+    def predizer_modelo(self, **kwargs) -> np.ndarray[Any]:
         pass
 
     @abstractmethod

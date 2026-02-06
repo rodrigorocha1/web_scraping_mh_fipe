@@ -36,7 +36,6 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
 
         assert self._pipeline is not None
 
-
         if self._polinomial:
             self._pipeline.append(self.__modelo_polinomial)
         self._pipeline.append(self.__modelo)
@@ -58,13 +57,12 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
         self._pipeline.append(self.__modelo)
         pipeline = Pipeline(self._pipeline)
 
-
         grid_search = GridSearchCV(
             estimator=pipeline,
             param_grid=self.__PARAM_GRID,
             scoring='neg_root_mean_squared_error',
             cv=5,
-            n_jobs=-1,
+            n_jobs=4,
             verbose=1,
             return_train_score=True,
 
@@ -97,6 +95,7 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
             y,
             cv=kfold,
             scoring=scoring,
+            n_jobs=4,
             return_train_score=True,
             error_score='raise'
         )

@@ -2,8 +2,8 @@
 #
 # import xgboost as xgb
 #
-# from src.estrategia.estrategia_modelo_xgboost import EstrategiaModeloXgboost
-# from src.utils.utils import carregar_dados_yaml_lista
+# from src_machine_learning.estrategia_modelo. import EstrategiaModeloXgboost
+# from src_machine_learning.utils.utils import carregar_dados_yaml_lista
 #
 #
 # class EstrategiaXgboost(EstrategiaModeloXgboost):
