@@ -1,0 +1,8 @@
+{
+    "regressor__alpha": 1.0,
+    "regressor__fit_intercept": true,
+    "regressor__max_iter": 5000,
+    "regressor__tol": 0.001,
+    "data_coleta": "02/02/2026 14:23:40",
+    "nome_modelo": "regressao_linear_ridge"
+}

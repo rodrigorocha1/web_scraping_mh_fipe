@@ -1,0 +1,10 @@
+{
+    "regressor__ccp_alpha": 0.0,
+    "regressor__criterion": "friedman_mse",
+    "regressor__max_depth": 20,
+    "regressor__max_features": null,
+    "regressor__min_samples_leaf": 1,
+    "regressor__min_samples_split": 10,
+    "data_coleta": "02/02/2026 14:23:16",
+    "nome_modelo": "regressao_random_florest"
+}

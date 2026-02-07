@@ -1,0 +1,16 @@
+{
+    "regressor__regressor__activation": "relu",
+    "regressor__regressor__alpha": 0.0001,
+    "regressor__regressor__early_stopping": true,
+    "regressor__regressor__hidden_layer_sizes": [
+        100,
+        50
+    ],
+    "regressor__regressor__learning_rate_init": 0.001,
+    "regressor__regressor__max_iter": 2000,
+    "regressor__regressor__n_iter_no_change": 20,
+    "regressor__regressor__solver": "adam",
+    "regressor__regressor__tol": 0.0001,
+    "data_coleta": "02/02/2026 13:54:27",
+    "nome_modelo": "regressao_rede_neural"
+}

@@ -1,0 +1,11 @@
+{
+    "regressor__ccp_alpha": 0.01,
+    "regressor__criterion": "friedman_mse",
+    "regressor__max_depth": 20,
+    "regressor__max_features": null,
+    "regressor__max_leaf_nodes": null,
+    "regressor__min_samples_leaf": 2,
+    "regressor__min_samples_split": 10,
+    "data_coleta": "02/02/2026 12:32:59",
+    "nome_modelo": "regressao_arvore_de_decisao"
+}

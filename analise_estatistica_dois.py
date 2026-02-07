@@ -1,11 +1,12 @@
-import pandas as pd
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.stats import norm
-import scipy.stats as stats
-from matplotlib.backends.backend_pdf import PdfPages
-import numpy as np
 import os
+
+import matplotlib.pyplot as plt
+import numpy as np
+import pandas as pd
+import scipy.stats as stats
+import seaborn as sns
+from matplotlib.backends.backend_pdf import PdfPages
+from scipy.stats import norm
 
 
 def configurar_pandas():
@@ -81,45 +82,64 @@ def processar_e_salvar_resultados(df_resultados, nome_arquivo_saida, alpha=0.05)
 
 
 def gerar_graficos_distribuicao(df, modelos, labels_modelos, nome_pdf, nome_imagem_exemplo):
-    """
-    Gera gráficos de distribuição (Hist + KDE + Normal) para cada iteração em um PDF.
-    """
     iteracoes = sorted(df['iteracao'].unique())
     print(f"\nGerando gráficos para {len(iteracoes)} iterações...")
 
-    # Garante que o diretório existe se houver subpasta
     if '/' in nome_pdf:
         os.makedirs(os.path.dirname(nome_pdf), exist_ok=True)
 
+    n_modelos = len(modelos)
+    n_cols = 2
+    n_rows = int(np.ceil(n_modelos / n_cols))
+
     with PdfPages(nome_pdf) as pdf:
         for i, num_iter in enumerate(iteracoes):
-            fig, axes = plt.subplots(2, 2, figsize=(12, 10))
-            fig.suptitle(f'Distribuição Normal dos Resíduos - Iteração {num_iter}', fontsize=16)
+            fig, axes = plt.subplots(n_rows, n_cols, figsize=(12, 4 * n_rows))
+            axes = axes.flatten()
+
+            fig.suptitle(
+                f'Distribuição Normal dos Resíduos - Iteração {num_iter}',
+                fontsize=16
+            )
 
             df_iter = df[df['iteracao'] == num_iter]
 
             for j, (modelo, label) in enumerate(zip(modelos, labels_modelos)):
-                ax = axes.flatten()[j]
+                ax = axes[j]
                 dados = df_iter[modelo].dropna()
 
-                # Histograma e KDE
-                sns.histplot(dados, kde=True, stat="density", ax=ax, color='skyblue', label='Resíduos (KDE)')
+                sns.histplot(
+                    dados,
+                    kde=True,
+                    stat="density",
+                    ax=ax,
+                    color='skyblue',
+                    label='Resíduos (KDE)'
+                )
 
-                # Curva Normal Ajustada
                 mu, std = norm.fit(dados)
                 xmin, xmax = ax.get_xlim()
                 x = np.linspace(xmin, xmax, 100)
                 p = norm.pdf(x, mu, std)
-                ax.plot(x, p, 'r', linewidth=2, label=f'Normal ($\mu$={mu:.0f}, $\sigma$={std:.0f})')
+
+                ax.plot(
+                    x,
+                    p,
+                    'r',
+                    linewidth=2,
+                    label=f'Normal ($\mu$={mu:.0f}, $\sigma$={std:.0f})'
+                )
 
                 ax.set_title(label)
                 ax.legend(loc='best', fontsize='small')
 
-            plt.tight_layout(rect=[0, 0.03, 1, 0.95])
+            # Remove subplots vazios
+            for k in range(j + 1, len(axes)):
+                fig.delaxes(axes[k])
 
+            plt.tight_layout(rect=[0, 0.03, 1, 0.95])
             pdf.savefig(fig)
 
-            # Salva a primeira iteração como exemplo
             if i == 0:
                 fig.savefig(nome_imagem_exemplo)
 
@@ -128,12 +148,17 @@ def gerar_graficos_distribuicao(df, modelos, labels_modelos, nome_pdf, nome_imag
     print(f"Arquivo PDF gerado: {nome_pdf}")
     print(f"Imagem de exemplo gerada: {nome_imagem_exemplo}")
 
+
 def executar_testes_multicomp(df_principal):
     iteracao = df_principal['iteracao'].to_list()
-    resultados_arvore = df_principal['residuos_totais_arvore_decisao'].to_list()
-    resultados_random = df_principal['residuos_totais_random_florest'].to_list()
-    resultados_svr = df_principal['residuos_totais_regressao_svr'].to_list()
-    resultados_rede = df_principal['residuos_totais_rede_neural'].to_list()
+    resultados_arvore = df_principal['residuos_totais_regressao_arvore_de_decisao'].to_list()
+    resultados_random = df_principal['residuos_totais_regressao_random_florest'].to_list()
+    resultados_svr = df_principal['residuos_totais_regressao_s_v_r'].to_list()
+    resultados_rede = df_principal['residuos_totais_regressao_rede_neural'].to_list()
+    resultados_elastic_net = df_principal['residuos_totais_regressao_elastic_net'].to_list()
+    resultados_lasso = df_principal['residuos_totais_regressao_linear_lasso'].to_list()
+    resultados_ridge = df_principal['residuos_totais_regressao_linear_ridge'].to_list()
+    resultados_linear = df_principal['residuos_totais_regressao_linear'].to_list()
 
     # Obter o número de iterações para garantir que a multiplicação da lista 'algoritmo' esteja correta
     n = len(df_principal)
@@ -141,13 +166,14 @@ def executar_testes_multicomp(df_principal):
     # 2. Montar o dicionário (Corrigindo o tamanho da lista 'iteracao')
     dados = {
         # Repetimos a lista de iterações 4 vezes para alinhar com os 4 algoritmos empilhados
-        'iteracao': iteracao * 4,
+        'iteracao': iteracao * 8,
 
         # Criamos a lista de nomes dinamicamente baseada no tamanho 'n'
-        'algoritmo': ['arvore_decisao'] * n + ['regressao_svr'] * n + ['random_florest'] * n + ['rede_neural'] * n,
+        'algoritmo': ['arvore_decisao'] * n + ['regressao_svr'] * n + ['random_florest'] * n + ['rede_neural'] * n +
+                     ['elastic_net'] * n + ['lasso'] * n + ['ridge'] * n + ['linear'] * n,
 
         # Concatenamos os resultados na mesma ordem dos nomes acima
-        'resultados': resultados_arvore + resultados_svr + resultados_random + resultados_rede
+        'resultados': resultados_arvore + resultados_svr + resultados_random + resultados_rede + resultados_elastic_net + resultados_lasso + resultados_ridge + resultados_linear
     }
     df_final = pd.DataFrame(dados)
 
@@ -172,25 +198,30 @@ if __name__ == "__main__":
     ARQUIVO_IMG = 'distribuicao_exemplo_refatorado.png'
 
     MODELOS = [
-        'residuos_totais_arvore_decisao',
-        'residuos_totais_random_florest',
-        'residuos_totais_regressao_svr',
-        'residuos_totais_rede_neural'
+        'residuos_totais_regressao_arvore_de_decisao',
+        'residuos_totais_regressao_random_florest',
+        'residuos_totais_regressao_s_v_r',
+        'residuos_totais_regressao_rede_neural',
+        'residuos_totais_regressao_elastic_net',
+        'residuos_totais_regressao_linear_lasso',
+        'residuos_totais_regressao_linear_ridge',
+        'residuos_totais_regressao_linear'
+
     ]
-    LABELS = ['Árvore de Decisão', 'Random Forest', 'SVR', 'Rede Neural']
+    LABELS = ['Árvore de Decisão', 'Random Forest', 'SVR', 'Rede Neural', 'Elastic net', 'Lasso', 'Ridge', 'linear']
 
     # 1. Carregar
     df_principal = carregar_dados(ARQUIVO_ENTRADA)
-
+    print(df_principal.head())
 
     # # 2. Testar Normalidade
-    # df_testes = executar_testes_normalidade(df_principal, MODELOS)
+    df_testes = executar_testes_normalidade(df_principal, MODELOS)
     #
     # # 3. Salvar Resultados
-    # processar_e_salvar_resultados(df_testes, ARQUIVO_RESULTADOS)
+    processar_e_salvar_resultados(df_testes, ARQUIVO_RESULTADOS)
     #
     # # 4. Gerar Gráficos
-    # gerar_graficos_distribuicao(df_principal, MODELOS, LABELS, ARQUIVO_PDF, ARQUIVO_IMG)
+    gerar_graficos_distribuicao(df_principal, MODELOS, LABELS, ARQUIVO_PDF, ARQUIVO_IMG)
 
     # 1. Extrair as listas
     executar_testes_multicomp(df_principal)

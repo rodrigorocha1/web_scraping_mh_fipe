@@ -28,14 +28,14 @@ opcao = 1
 opcao_execucao = 3
 inicio_modelo = time.time()
 modelos: List[Tuple[Avaliador, EstrategiaModelo]] = [
-    (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao=opcao)),
-    (AvaliadorSVR(), EstrategiaRegressaoSVR(opcao=opcao)),
-    (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural(opcao=opcao)),
-    (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest(opcao=opcao)),
+    # (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao=opcao)),
+    # (AvaliadorSVR(), EstrategiaRegressaoSVR(opcao=opcao)),
+    # (AvaliadorRedeNeural(), EstrategiaRegressaoRedeNeural(opcao=opcao)),
+    # (AvaliadorFlorestaAleatoria(), EstrategiaRegressaoRandomFlorest(opcao=opcao)),
     (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao=opcao)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(opcao=opcao)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao)),
-    (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao=opcao)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(opcao=opcao)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao)),
+    # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoElasticNet(opcao=opcao)),
     # (AvaliadorRegressaoLinear(), EstrategiaRegressaoLinear(opcao=opcao, polinomial=True)),
     # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearLasso(polinomial=True)),
     # (AvaliadorRegressaoLinearRegularizada(), EstrategiaRegressaoLinearRidge(opcao=opcao, polinomial=True)),

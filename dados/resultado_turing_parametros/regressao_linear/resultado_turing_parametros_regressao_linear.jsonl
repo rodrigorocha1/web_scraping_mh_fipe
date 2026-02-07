@@ -1,0 +1,8 @@
+{
+    "regressor__copy_X": true,
+    "regressor__fit_intercept": false,
+    "regressor__n_jobs": null,
+    "regressor__positive": true,
+    "data_coleta": "02/02/2026 14:23:19",
+    "nome_modelo": "regressao_linear"
+}

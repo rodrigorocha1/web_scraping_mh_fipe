@@ -1,0 +1,8 @@
+{
+    "regressor__alpha": 0.01,
+    "regressor__fit_intercept": true,
+    "regressor__max_iter": 5000,
+    "regressor__tol": 0.001,
+    "data_coleta": "02/02/2026 14:23:42",
+    "nome_modelo": "regressao_elastic_net"
+}

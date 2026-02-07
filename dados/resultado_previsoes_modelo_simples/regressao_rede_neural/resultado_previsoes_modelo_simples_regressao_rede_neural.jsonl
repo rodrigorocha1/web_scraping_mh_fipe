@@ -1,0 +1,29 @@
+{
+    "mae": 14920.084578376996,
+    "rmse": 27964.74168565859,
+    "medae": 6588.655788022283,
+    "smape": 18.06706022550039,
+    "r2": 0.8937833303207321,
+    "bias": 3934.853471986137,
+    "accuracy_erro_10_pct": 0.44394110985277463,
+    "n_amostras": 5298,
+    "preco_medio_real": 89551.59777274443,
+    "preco_medio_previsto": 93486.45124473058,
+    "data_coleta": "02/02/2026 08:37:36",
+    "nome_modelo": "regressao_rede_neural"
+}
+
+{
+    "mae": 14920.084578376996,
+    "rmse": 27964.74168565859,
+    "medae": 6588.655788022283,
+    "smape": 18.06706022550039,
+    "r2": 0.8937833303207321,
+    "bias": 3934.853471986137,
+    "accuracy_erro_10_pct": 0.44394110985277463,
+    "n_amostras": 5298,
+    "preco_medio_real": 89551.59777274443,
+    "preco_medio_previsto": 93486.45124473058,
+    "data_coleta": "02/02/2026 14:33:15",
+    "nome_modelo": "regressao_rede_neural"
+}
