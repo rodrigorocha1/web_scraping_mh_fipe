@@ -177,11 +177,10 @@ class AvaliadorArvoreDecisao(Avaliador):
 
         return resultados
 
-    def gerar_grafico_underfit_overfit(self, metricas: Dict[str, Any]) -> Dict[str, BytesIO]:
+    def gerar_grafico_underfit_overfit(self, metricas: Dict[str, Any]):
         """
         Retorna gráfico Underfitting vs Overfitting para uso em custom_artifacts do MLflow
         """
-        print(metricas)
 
         param_range = self.__param_range
         train_rmse = metricas["train_rmse"]
@@ -253,11 +252,11 @@ class AvaliadorArvoreDecisao(Avaliador):
         buf = BytesIO()
         fig.savefig(buf, format="png")
         buf.seek(0)
+        img = Image.open(buf)
+        mlflow.log_image(img, "over_under_av.png")
         plt.close(fig)
 
-        return {
-            "underfit_overfit.png": buf
-        }
+
 
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:

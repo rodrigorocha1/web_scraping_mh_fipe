@@ -51,21 +51,7 @@ class PrepocessadorSklearnn(Processador):
         preprocessador = ('preprocessor', preprocessor)
         return [feature_engineering, preprocessador]
 
-    def _custom_artifact_underfit_overfit(
-            self,
-            eval_df,
-            builtin_metrics,
-            artifacts_dir
-    ):
-        pipeline = self._estrategia_modelo.dados_treinamento
 
-        metricas = self._avaliador.obter_dados_curva_validacao(
-            pipeline=pipeline,
-            X_train=self._x_train,
-            y_train=self._y_train
-        )
-
-        return self._avaliador.gerar_grafico_underfit_overfit(metricas)
 
     def executar(self, opcao: int):
 
@@ -121,13 +107,18 @@ class PrepocessadorSklearnn(Processador):
                         model_info.model_uri,
                         eval_data,
                         targets="preco",
-                        model_type="regressor",
-                        custom_artifacts=[self._custom_artifact_underfit_overfit]
+                        model_type="regressor"
                     )
 
                     print(f"MAE: {result.metrics['mean_absolute_error']:.3f}")
                     print(f"RMSE: {result.metrics['root_mean_squared_error']:.3f}")
                     print(f"R² Score: {result.metrics['r2_score']:.3f}")
+                    metricas = self._avaliador.obter_dados_curva_validacao(
+                        pipeline=pipeline,
+                        X_train=self._x_train,
+                        y_train=self._y_train
+                    )
+                    self._avaliador.gerar_grafico_underfit_overfit(metricas)
 
                     registered_model_name = artifact_name
 
