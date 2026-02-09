@@ -1,0 +1,53 @@
+import logging
+import sys
+import time
+from typing import List, Tuple
+
+from tqdm import tqdm
+
+from src_machine_learning.avaliador_mlops.avaliador_avore_decisao import AvaliadorArvoreDecisao
+from src_machine_learning.estrategia_modelo.estrategia_regressao_arvore_decisao import \
+    EstrategiaRegressaoArvoreDeDecisao
+from src_machine_learning.processador.prepocessador_sklearn_ml_ops import PrepocessadorSklearnn
+
+opcao = 1
+opcao_execucao = 1
+inicio_modelo = time.time()
+modelos: List[Tuple] = [
+    (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao=opcao)),
+
+]
+
+inicio_total = time.time()  # tempo total do script
+
+for modelo in tqdm(
+        modelos,
+        desc=f"🔎 Treinando modelo  ",
+        unit="modelo",
+        file=sys.stdout,  # 👈 força exibição no terminal
+        ncols=100  # 👈 largura fixa (opcional)
+):
+    avaliador, modelo_ml = modelo
+    logging.info(f'Treinando modelo {modelo_ml.__class__.__name__.split(".")[-1]}')
+    inicio_modelo = time.time()
+    p = PrepocessadorSklearnn(
+        avaliador=avaliador,
+        estratregia_modelo=modelo_ml
+    )
+    p.executar(opcao_execucao)
+    fim_modelo = time.time()
+
+    tempo_modelo = fim_modelo - inicio_modelo
+    minutos_modelo = int(tempo_modelo // 60)
+    segundos_modelo = int(tempo_modelo % 60)
+    logging.info(
+        f'Tempo de execução do modelo {modelo_ml.__class__.__name__}: {minutos_modelo}:{segundos_modelo:02d} minutos'
+    )
+tempo_fim = time.time()
+tempo_execucao_total = tempo_fim - inicio_modelo
+
+fim_total = time.time()
+tempo_total = fim_total - inicio_total
+minutos_total = int(tempo_total // 60)
+segundos_total = int(tempo_total % 60)
+logging.info(f'Tempo de execução total : {minutos_total}:{segundos_total:02d} minutos')

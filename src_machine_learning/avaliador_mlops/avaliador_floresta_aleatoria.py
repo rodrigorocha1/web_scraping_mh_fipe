@@ -1,0 +1,354 @@
+import logging
+from datetime import datetime
+from typing import Dict, Any, Counter
+
+import matplotlib.pyplot as plt
+import numpy as np
+from pandas import Series, DataFrame
+from sklearn.ensemble import RandomForestRegressor
+from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
+from sklearn.model_selection import GridSearchCV, validation_curve
+from sklearn.pipeline import Pipeline
+from sklearn.tree import export_text, DecisionTreeRegressor
+
+from src_machine_learning.avaliador.avaliador import Avaliador
+
+
+class AvaliadorFlorestaAleatoria(Avaliador):
+
+    def __init__(self):
+        self.__param_range = np.arange(2, 50, 2)
+        self._logger = logging.getLogger(self.__class__.__name__)
+
+    def obter_dados_curva_validacao(self, pipeline: Pipeline, X_train: DataFrame, y_train: Series) -> Dict[str, Any]:
+        train_scores, val_scores = validation_curve(
+            estimator=pipeline,
+            X=X_train,
+            y=y_train,
+            param_name='regressor__max_depth',
+            param_range=self.__param_range,
+            cv=5,
+            scoring='neg_root_mean_squared_error',
+            n_jobs=-1
+        )
+
+        # Converter para RMSE positivo
+        train_rmse = -train_scores.mean(axis=1)
+        val_rmse = -val_scores.mean(axis=1)
+
+        train_std = train_scores.std(axis=1)
+        val_std = val_scores.std(axis=1)
+        best_idx = np.argmin(val_rmse)
+        best_depth = float(self.__param_range[best_idx])
+        best_rmse = float(val_rmse[best_idx])
+
+        dados = {
+            'train_rmse': train_rmse.tolist(),
+            'val_rmse': val_rmse.tolist(),
+            'train_std': train_std.tolist(),
+            'val_std': val_std.tolist(),
+            'best_depth': best_depth,
+            'best_rmse': best_rmse
+
+        }
+
+        return dados
+
+    def __obter_arvore_mais_importante(
+            self,
+            rf: RandomForestRegressor
+    ) -> DecisionTreeRegressor:
+        """
+        Heurística:
+        árvore cuja soma das importâncias das features é a maior
+        """
+        scores = [
+            float(tree.feature_importances_.sum())
+            for tree in rf.estimators_
+        ]
+
+        idx = int(np.argmax(scores))
+        return rf.estimators_[idx]
+
+    def __contar_features_usadas(
+            self,
+            tree: DecisionTreeRegressor,
+            feature_names: list[str]
+    ) -> dict[str, int]:
+        """
+        Conta quantas vezes cada feature aparece nos splits da árvore
+        """
+        features_idx = tree.tree_.feature
+        contador: Counter[str] = Counter()
+
+        for idx in features_idx:
+            if idx != -2:  # -2 = nó folha
+                contador[feature_names[idx]] += 1
+
+        return dict(contador.most_common())
+
+    def __logar_arvore_mais_importante(
+            self,
+            pipeline: Pipeline,
+            max_depth: int | None = None,
+            top_n_features: int = 10,
+
+    ):
+        assert pipeline is not None, "Pipeline não foi treinado"
+
+        rf: RandomForestRegressor = pipeline.named_steps['regressor']
+        preprocessor = pipeline.named_steps['preprocessor']
+
+        feature_names = list(preprocessor.get_feature_names_out())
+
+        tree = self.__obter_arvore_mais_importante(rf)
+
+        regras = export_text(
+            decision_tree=tree,
+            feature_names=feature_names,
+            max_depth=max_depth,
+            decimals=3
+        )
+
+        features_mais_usadas = self.__contar_features_usadas(tree, feature_names)
+
+        self._logger.info("=" * 90)
+        self._logger.info("ÁRVORE MAIS IMPORTANTE DO RANDOM FOREST")
+        self._logger.info("Profundidade real: %s", tree.get_depth())
+        self._logger.info("Nós: %s | Folhas: %s",
+                          tree.tree_.node_count,
+                          tree.get_n_leaves())
+        self._logger.info("=" * 90)
+
+        # Log das regras
+        for linha in regras.split("\n"):
+            self._logger.info(linha)
+
+        self._logger.info("-" * 90)
+        self._logger.info("FEATURES MAIS USADAS (frequência de split)")
+
+        for i, (feature, freq) in enumerate(features_mais_usadas.items(), start=1):
+            if i > top_n_features:
+                break
+            self._logger.info("%02d. %s → %s splits", i, feature, freq)
+
+        self._logger.info("=" * 90)
+
+    def obter_resultados_modelo(self, pipeline: Pipeline, y_test: Series, y_pred:  np.ndarray[Any, np.dtype[Any]]) -> Dict[str, Any]:
+        assert pipeline is not None, "Pipeline não foi treinado"
+        rf: RandomForestRegressor = pipeline.named_steps['regressor']
+        preprocessor = pipeline.named_steps['preprocessor']
+
+        y_test_arr = np.asarray(y_test)
+        y_pred_arr = np.asarray(y_pred)
+
+        # =========================
+        # Métricas de regressão
+        # =========================
+        mae = mean_absolute_error(y_test_arr, y_pred_arr)
+        rmse = np.sqrt(mean_squared_error(y_test_arr, y_pred_arr))
+        medae = median_absolute_error(y_test_arr, y_pred_arr)
+        r2 = r2_score(y_test_arr, y_pred_arr)
+
+        # SMAPE (robusto para imóveis)
+        smape = np.mean(
+            2.0 * np.abs(y_pred_arr - y_test_arr)
+            / (np.abs(y_test_arr) + np.abs(y_pred_arr))
+        ) * 100
+
+        # Bias (viés médio)
+        bias = float(np.mean(y_pred_arr - y_test_arr))
+
+        # % de previsões com erro ≤ 10%
+        erro_percentual = np.abs(y_pred_arr - y_test_arr) / y_test_arr
+        acc_10 = float(np.mean(erro_percentual <= 0.10))
+
+        feature_names = list(preprocessor.get_feature_names_out())
+        importancias = dict(
+            sorted(
+                zip(
+                    feature_names,
+                    map(float, rf.feature_importances_)
+                ),
+                key=lambda x: x[1],
+                reverse=True
+            )
+        )
+
+        self.__logar_arvore_mais_importante(
+            max_depth=4,
+            top_n_features=8,
+            pipeline=pipeline
+        )
+
+        profundidades = [tree.get_depth() for tree in rf.estimators_]
+        folhas = [tree.get_n_leaves() for tree in rf.estimators_]
+
+        resultados: Dict[str, Any] = {
+            # Métricas principais
+            "mae": mae,
+            "rmse": rmse,
+            "medae": medae,
+            "smape": smape,
+            "r2": r2,
+            "bias": bias,
+            "accuracy_erro_10_pct": acc_10,
+
+            # Estatísticas do target
+            "preco_medio_real": float(np.mean(y_test_arr)),
+            "preco_medio_previsto": float(np.mean(y_pred_arr)),
+            "n_amostras": len(y_test_arr),
+
+            # Complexidade média do ensemble
+            "profundidade_media_arvores": float(np.mean(profundidades)),
+            "folhas_media_arvores": float(np.mean(folhas)),
+            "n_arvores": len(rf.estimators_),
+
+            # Interpretabilidade
+            "feature_importances": importancias,
+            "params_modelo": rf.get_params()
+        }
+
+        return resultados
+
+    def gerar_grafico_underfit_overfit(self, dados: Dict[str, Any]):
+        plt.figure(figsize=(12, 7))
+        train_rmse = dados['train_rmse']
+        val_rmse = dados['val_rmse']
+        train_std = dados['train_std']
+        val_std = dados['val_std']
+        best_depth = dados['best_depth']
+        best_rmse = dados['best_rmse']
+
+        # Curvas
+        plt.plot(
+            self.__param_range,
+            train_rmse,
+            marker='o',
+            linewidth=2,
+            label='RMSE Treino (Viés)'
+        )
+
+        plt.plot(
+            self.__param_range,
+            val_rmse,
+            marker='o',
+            linewidth=2,
+            label='RMSE Validação (Generalização)'
+        )
+
+        # Gap (variância)
+        plt.fill_between(
+            self.__param_range,
+            train_rmse,
+            val_rmse,
+            alpha=0.2,
+            label='Gap Treino × Validação (Variância)'
+        )
+
+        # Linha vertical no melhor depth
+        plt.axvline(
+            x=best_depth,
+            linestyle='--',
+            linewidth=2,
+            label=f'Melhor max_depth = {best_depth}'
+        )
+
+        # Marcar ponto ótimo
+        plt.scatter(
+            best_depth,
+            best_rmse,
+            s=120,
+            zorder=5
+        )
+
+        # Anotações
+        plt.text(
+            best_depth + 0.5,
+            best_rmse * 1.03,
+            f'Mínimo RMSE (CV)\nRMSE ≈ {best_rmse:,.0f}',
+            fontsize=10
+        )
+
+        plt.text(
+            self.__param_range[0],
+            max(val_rmse) * 0.95,
+            'UNDERFITTING\n(alto viés)',
+            fontsize=11,
+            ha='left'
+        )
+
+        plt.text(
+            self.__param_range[-1],
+            min(train_rmse) * 1.05,
+            'OVERFITTING\n(alta variância)',
+            fontsize=11,
+            ha='right'
+        )
+
+        # Labels finais
+        plt.xlabel('max_depth (Complexidade do Modelo)')
+        plt.ylabel('RMSE')
+        plt.title('Decision Floresta Aleatória — Diagnóstico de Overfitting vs Underfitting')
+        plt.legend()
+        plt.grid(True)
+        plt.tight_layout()
+        plt.savefig(
+            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_random_florest_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png')
+        plt.close()
+
+    def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:
+        def to_native(val):
+            if isinstance(val, (np.integer, np.int32, np.int64)):
+                return int(val)
+            elif isinstance(val, (np.floating, np.float32, np.float64)):
+                return float(val)
+            elif isinstance(val, np.ndarray):
+                return val.tolist()
+            elif isinstance(val, list):
+                return [to_native(v) for v in val]
+            elif isinstance(val, dict):
+                return {k: to_native(v) for k, v in val.items()}
+            return val
+
+        # RMSE positivo
+        best_rmse = float(-grid_search.best_score_)
+
+        # Conversão de best_params
+        best_params = {k: to_native(v) for k, v in grid_search.best_params_.items()}
+
+        # Obter o pipeline treinado com os melhores parâmetros
+        best_pipeline = grid_search.best_estimator_
+
+        # Extrair regressor e preprocessor
+        tree: DecisionTreeRegressor = best_pipeline.named_steps['regressor']
+        preprocessor = best_pipeline.named_steps['preprocessor']
+
+        # Obter nomes das features
+        feature_names = []
+        for nome, transformer, cols in preprocessor.transformers_:
+            if nome == 'remainder' and transformer == 'drop':
+                continue
+            if hasattr(transformer, 'get_feature_names_out'):
+                feature_names.extend(transformer.get_feature_names_out(cols))
+            else:
+                feature_names.extend(cols)
+
+        # Importâncias das features
+        feature_importances = dict(
+            sorted(
+                zip(feature_names, map(float, tree.feature_importances_)),
+                key=lambda x: x[1],
+                reverse=True
+            )
+        )
+
+        # Converter para tipos nativos
+        feature_importances = {k: to_native(v) for k, v in feature_importances.items()}
+
+        return {
+            "best_params": grid_search.best_params_,
+            "best_rmse": best_rmse,
+            "feature_importances": feature_importances
+        }
+
