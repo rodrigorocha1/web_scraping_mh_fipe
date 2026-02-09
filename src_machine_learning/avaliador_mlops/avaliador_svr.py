@@ -1,7 +1,9 @@
 from datetime import datetime
+from io import BytesIO
 from typing import Dict, Any
 
 import matplotlib.pyplot as plt
+import mlflow
 import numpy as np
 from pandas import Series, DataFrame
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
@@ -79,26 +81,45 @@ class AvaliadorSVR(Avaliador):
         return resultados
 
     def gerar_grafico_underfit_overfit(self, dados: Dict[str, Any]):
+        if not dados:
+            self._logger.warning("Sem dados para gerar gráfico")
+            return
+
         train_rmse = dados['train_rmse']
         val_rmse = dados['val_rmse']
         best_idx = dados['best_idx']
         best_C = dados['best_C']
         param_range = self.__param_range
+        nome_modelo = dados.get("nome_modelo", "svr_modelo")
 
-        plt.figure(figsize=(10, 6))
-        plt.plot(param_range, train_rmse, marker='o', label='RMSE Treino')
-        plt.plot(param_range, val_rmse, marker='o', label='RMSE Validação')
-        plt.axvline(best_C, linestyle='--', label=f'Melhor C = {best_C:.3f}')
-        plt.xscale('log')
-        plt.xlabel('C')
-        plt.ylabel('RMSE')
-        plt.title('SVR — Curva de Validação')
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.savefig(
-            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_svr_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png'
-        )
+        # Cria figura e eixo
+        fig, ax = plt.subplots(figsize=(10, 6))
+
+        # Plota curvas
+        ax.plot(param_range, train_rmse, marker='o', label='RMSE Treino')
+        ax.plot(param_range, val_rmse, marker='o', label='RMSE Validação')
+
+        # Linha vertical no melhor C
+        ax.axvline(best_C, linestyle='--', label=f'Melhor C = {best_C:.3f}')
+
+        # Escala logarítmica
+        ax.set_xscale('log')
+
+        # Labels e título
+        ax.set_xlabel('C')
+        ax.set_ylabel('RMSE')
+        ax.set_title('SVR — Curva de Validação')
+        ax.legend()
+        ax.grid(True)
+        fig.tight_layout()
+
+        # Salvar gráfico direto no MLflow
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
+        buf.seek(0)
+        mlflow.log_image(buf, f"under_over_svr_{nome_modelo}.png")
+
+        plt.close(fig)
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:
         def to_native(val):

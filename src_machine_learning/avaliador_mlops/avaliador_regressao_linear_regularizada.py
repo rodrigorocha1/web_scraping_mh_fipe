@@ -1,8 +1,10 @@
 import logging
 from datetime import datetime
+from io import BytesIO
 from typing import Dict, Any
 
 import matplotlib.pyplot as plt
+import mlflow
 import numpy as np
 import sklearn
 from pandas import Series, DataFrame
@@ -140,33 +142,37 @@ class AvaliadorRegressaoLinearRegularizada(Avaliador):
         return resultado
 
     def gerar_grafico_underfit_overfit(self, dados: Dict[str, Any]) -> None:
-        plt.figure(figsize=(12, 7))
+        if not dados:
+            self._logger.warning("Sem dados para gerar gráfico")
+            return
 
-        plt.semilogx(
-            dados["alpha_range"],
-            dados["train_rmse"],
-            marker="o",
-            label="Treino (Viés)",
-        )
-        plt.semilogx(
-            dados["alpha_range"],
-            dados["val_rmse"],
-            marker="o",
-            label="Validação (Generalização)",
-        )
+        alpha_range = dados["alpha_range"]
+        train_rmse = dados["train_rmse"]
+        val_rmse = dados["val_rmse"]
+        nome_modelo = dados.get("nome_modelo", "modelo_desconhecido")
 
-        plt.xlabel("alpha (Regularização)")
-        plt.ylabel("RMSE")
-        plt.title(f"Regressão Linear Regularizada - {dados['nome_modelo']} — Bias vs Variance")
-        plt.legend()
-        plt.grid(True)
+        # Criar figura e eixo
+        fig, ax = plt.subplots(figsize=(12, 7))
 
-        plt.tight_layout()
-        plt.savefig(
-            f"fig/gerar_grafico_over_under/{dados['nome_modelo']}/"
-            f"under_over_{datetime.now().strftime('%Y_%m_%d__%H_%M_%S')}.png"
-        )
-        plt.close()
+        # Plota curvas em escala logarítmica
+        ax.semilogx(alpha_range, train_rmse, marker="o", label="Treino (Viés)")
+        ax.semilogx(alpha_range, val_rmse, marker="o", label="Validação (Generalização)")
+
+        # Labels e título
+        ax.set_xlabel("alpha (Regularização)")
+        ax.set_ylabel("RMSE")
+        ax.set_title(f"Regressão Linear Regularizada - {nome_modelo} — Bias vs Variance")
+        ax.legend()
+        ax.grid(True)
+        fig.tight_layout()
+
+        # Salvar gráfico direto no MLflow
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
+        buf.seek(0)
+        mlflow.log_image(buf, f"under_over_{nome_modelo}.png")
+
+        plt.close(fig)
 
     def obter_resultado_grid_search(
             self, grid_search: GridSearchCV

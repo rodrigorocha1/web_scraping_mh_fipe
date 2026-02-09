@@ -1,6 +1,8 @@
 from datetime import datetime
+from io import BytesIO
 from typing import Dict, Any
 
+import mlflow
 import numpy as np
 from matplotlib import pyplot as plt
 from pandas import Series, DataFrame
@@ -85,19 +87,30 @@ class AvaliadorRedeNeural(Avaliador):
         best_hidden_layer = dados['best_hidden_layer']
         param_range = [str(h) for h in self.__param_range]
 
-        plt.figure(figsize=(12, 10))
-        plt.plot(param_range, train_rmse, marker='o', label='RMSE Treino')
-        plt.plot(param_range, val_rmse, marker='o', label='RMSE Validação')
-        plt.axvline(best_idx, linestyle='--', label=f'Melhor Hidden Layer = {best_hidden_layer}')
-        plt.xlabel('Arquitetura da Rede Neural')
-        plt.ylabel('RMSE')
-        plt.title('Rede Neural — Curva de Validação')
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.savefig(
-            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_rede_neural_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png'
-        )
+        # Cria a figura
+        fig, ax = plt.subplots(figsize=(12, 10))
+
+        # Plota curvas
+        ax.plot(param_range, train_rmse, marker='o', label='RMSE Treino')
+        ax.plot(param_range, val_rmse, marker='o', label='RMSE Validação')
+
+        # Linha vertical no melhor hidden layer
+        ax.axvline(best_idx, linestyle='--', label=f'Melhor Hidden Layer = {best_hidden_layer}')
+
+        # Labels e título
+        ax.set_xlabel('Arquitetura da Rede Neural')
+        ax.set_ylabel('RMSE')
+        ax.set_title('Rede Neural — Curva de Validação')
+        ax.legend()
+        ax.grid(True)
+        fig.tight_layout()
+
+        # Salvar no MLflow
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
+        buf.seek(0)
+        mlflow.log_image(buf, f"under_over_rede_neural.png")
+        plt.close(fig)
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) -> Dict[str, Any]:
         best_params = grid_search.best_params_

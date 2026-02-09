@@ -1,9 +1,12 @@
 import logging
 from datetime import datetime
+from io import BytesIO
 from typing import Dict, Any, Counter
 
 import matplotlib.pyplot as plt
+import mlflow
 import numpy as np
+from PIL import Image
 from pandas import Series, DataFrame
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
@@ -212,7 +215,9 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         return resultados
 
     def gerar_grafico_underfit_overfit(self, dados: Dict[str, Any]):
-        plt.figure(figsize=(12, 7))
+        # Cria a figura e o eixo
+        fig, ax = plt.subplots(figsize=(12, 7))
+
         train_rmse = dados['train_rmse']
         val_rmse = dados['val_rmse']
         train_std = dados['train_std']
@@ -220,16 +225,15 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         best_depth = dados['best_depth']
         best_rmse = dados['best_rmse']
 
-        # Curvas
-        plt.plot(
+        # Curvas de RMSE
+        ax.plot(
             self.__param_range,
             train_rmse,
             marker='o',
             linewidth=2,
             label='RMSE Treino (Viés)'
         )
-
-        plt.plot(
+        ax.plot(
             self.__param_range,
             val_rmse,
             marker='o',
@@ -237,8 +241,8 @@ class AvaliadorFlorestaAleatoria(Avaliador):
             label='RMSE Validação (Generalização)'
         )
 
-        # Gap (variância)
-        plt.fill_between(
+        # Preencher gap
+        ax.fill_between(
             self.__param_range,
             train_rmse,
             val_rmse,
@@ -247,15 +251,15 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         )
 
         # Linha vertical no melhor depth
-        plt.axvline(
+        ax.axvline(
             x=best_depth,
             linestyle='--',
             linewidth=2,
             label=f'Melhor max_depth = {best_depth}'
         )
 
-        # Marcar ponto ótimo
-        plt.scatter(
+        # Ponto ótimo
+        ax.scatter(
             best_depth,
             best_rmse,
             s=120,
@@ -263,22 +267,20 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         )
 
         # Anotações
-        plt.text(
+        ax.text(
             best_depth + 0.5,
             best_rmse * 1.03,
             f'Mínimo RMSE (CV)\nRMSE ≈ {best_rmse:,.0f}',
             fontsize=10
         )
-
-        plt.text(
+        ax.text(
             self.__param_range[0],
             max(val_rmse) * 0.95,
             'UNDERFITTING\n(alto viés)',
             fontsize=11,
             ha='left'
         )
-
-        plt.text(
+        ax.text(
             self.__param_range[-1],
             min(train_rmse) * 1.05,
             'OVERFITTING\n(alta variância)',
@@ -287,15 +289,20 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         )
 
         # Labels finais
-        plt.xlabel('max_depth (Complexidade do Modelo)')
-        plt.ylabel('RMSE')
-        plt.title('Decision Floresta Aleatória — Diagnóstico de Overfitting vs Underfitting')
-        plt.legend()
-        plt.grid(True)
-        plt.tight_layout()
-        plt.savefig(
-            f'fig/gerar_grafico_over_under/{dados["nome_modelo"]}/gerar_grafico_underfit_overfit_random_florest_{datetime.now().strftime("%Y_%m_%d__%H_%M_%S")}.png')
-        plt.close()
+        ax.set_xlabel('max_depth (Complexidade do Modelo)')
+        ax.set_ylabel('RMSE')
+        ax.set_title('Decision Floresta Aleatória — Diagnóstico de Overfitting vs Underfitting')
+        ax.legend()
+        ax.grid(True)
+        fig.tight_layout()
+
+        # Salvar no MLflow
+        buf = BytesIO()
+        fig.savefig(buf, format="png")
+        buf.seek(0)
+        img = Image.open(buf)
+        mlflow.log_image(img, "over_under_random_forest.png")
+        plt.close(fig)
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:
         def to_native(val):
