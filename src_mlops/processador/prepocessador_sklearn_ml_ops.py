@@ -51,8 +51,6 @@ class PrepocessadorSklearnn(Processador):
         preprocessador = ('preprocessor', preprocessor)
         return [feature_engineering, preprocessador]
 
-
-
     def executar(self, opcao: int):
 
         match opcao:
@@ -158,7 +156,16 @@ class PrepocessadorSklearnn(Processador):
 
                     print(f"Best params: {resultado_grid.best_params_}")
                     print(f"Best CV score: {resultado_grid.best_score_:.3f}")
-                    print(f"Test score: {resultado_grid:.3f}")
+                    try:
+                        print(f"Test score: {resultado_grid:.3f}")
+                    except:
+                        pass
+
+                    mlflow.sklearn.log_model(
+                        sk_model= resultado_grid.best_params_,
+                        artifact_path="model",
+                        registered_model_name=f"{nome_modelo}_v2"
+                    )
 
             case 3:
 
@@ -186,31 +193,39 @@ class PrepocessadorSklearnn(Processador):
                 self._estrategia_modelo.pipeline = passos_pipeline
 
                 for i in range(30):
-                    logging.info(f'Fazendo validação cruzada para {nome_modelo} - Iteração {i}')
+                    with mlflow.start_run(run_name=f"cv_iteracao_{i}", nested=True):
 
-                    resultado_validacao_cruzada = self._estrategia_modelo.realizar_validacao_cruzada(
-                        x=x_completo,
-                        y=y_completo,
-                        iteracao=i
-                    )
+                        logging.info(
+                            f'Fazendo validação cruzada para {nome_modelo} - Iteração {i}'
+                        )
 
-                    for nome, valor in passos_pipeline:
-                        if hasattr(valor, 'get_params'):
-                            params = valor.get_params()
-                            for p_nome, p_valor in params.items():
-                                mlflow.log_param(f"{nome}_{p_nome}", p_valor)
+                        resultado_validacao_cruzada = self._estrategia_modelo.realizar_validacao_cruzada(
+                            x=x_completo,
+                            y=y_completo,
+                            iteracao=i
+                        )
+
+                        # Log parâmetros do pipeline
+                        for nome, valor in passos_pipeline:
+                            if hasattr(valor, 'get_params'):
+                                params = valor.get_params()
+                                for p_nome, p_valor in params.items():
+                                    mlflow.log_param(f"{nome}_{p_nome}", p_valor)
 
                         # Métricas médias
-                    for metrica, valor in resultado_validacao_cruzada["mean_scores"].items():
-                        mlflow.log_metric(metrica, valor)
+                        for metrica, valor in resultado_validacao_cruzada["mean_scores"].items():
+                            mlflow.log_metric(metrica, valor)
 
-                        # Métricas por fold (RMSE)
-                    for idx, rmse in enumerate(resultado_validacao_cruzada["rmse_folds"]):
-                        mlflow.log_metric(f"rmse_fold_{idx}", rmse)
+                        # Métricas por fold
+                        for idx, rmse in enumerate(resultado_validacao_cruzada["rmse_folds"]):
+                            mlflow.log_metric(f"rmse_fold_{idx}", rmse)
 
-                    mlflow.set_tag("iteracao", i)
-                    mlflow.set_tag("nome_modelo", nome_modelo)
+                        mlflow.set_tag("iteracao", i)
+                        mlflow.set_tag("nome_modelo", nome_modelo)
 
-                    flag_polinomial = self._estrategia_modelo.polinomial
-                    if flag_polinomial:
-                        nome_modelo = f'{nome_modelo}_polinomial'
+                        # 🔥 REGISTRAR MODELO
+                        mlflow.sklearn.log_model(
+                            sk_model=self._estrategia_modelo.pipeline,
+                            artifact_path="model",
+                            registered_model_name=f"{nome_modelo}_cv_v2"
+                        )
