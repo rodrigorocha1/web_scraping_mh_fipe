@@ -5,10 +5,10 @@ from typing import List, Tuple
 
 from tqdm import tqdm
 
-from src_machine_learning.avaliador_mlops.avaliador_avore_decisao import AvaliadorArvoreDecisao
-from src_machine_learning.estrategia_modelo.estrategia_regressao_arvore_decisao import \
+from src_mlops.avaliador_mlops.avaliador_avore_decisao import AvaliadorArvoreDecisao
+from src_mlops.estrategia_modelo.estrategia_regressao_arvore_decisao import \
     EstrategiaRegressaoArvoreDeDecisao
-from src_machine_learning.processador.prepocessador_sklearn_ml_ops import PrepocessadorSklearnn
+from src_mlops.processador.prepocessador_sklearn_ml_ops import PrepocessadorSklearnn
 
 opcao = 1
 opcao_execucao = 1

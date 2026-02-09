@@ -1,89 +1,137 @@
-import os
-
-import matplotlib.pyplot as plt
-import mlflow.sklearn
+import io
 import numpy as np
 import pandas as pd
-from sklearn.linear_model import LinearRegression
+import matplotlib.pyplot as plt
+from PIL import Image
+import mlflow
+from mlflow.metrics import MetricValue
+from mlflow.models import make_metric, infer_signature
+from sklearn.datasets import make_regression
+from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
+from sklearn.metrics import mean_squared_error
+from src_machine_learning.utils.mlflow_config import configurar_mlflow
 
+# =========================
+# Configura MLflow
+# =========================
 MLFLOW_URI = "http://172.25.0.5:5000"
-mlflow.set_tracking_uri(MLFLOW_URI)
-mlflow.set_registry_uri(MLFLOW_URI)
+EXPERIMENT_NAME = "regressao_underfit_overfit_buffer_final"
+configurar_mlflow(experiment_name=EXPERIMENT_NAME, tracking_uri=MLFLOW_URI)
 
-EXPERIMENT_NAME = "experimento_hiperparametro"
-mlflow.set_experiment(EXPERIMENT_NAME)
+# =========================
+# Dados
+# =========================
+X, y = make_regression(n_samples=1000, n_features=20, noise=15.0, random_state=42)
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.3, random_state=42)
 
-# ----------------------------
-# 1. Criando um dataset de exemplo
-# ----------------------------
-np.random.seed(42)
-n_samples = 100
-X = np.random.rand(n_samples, 1) * 10  # Features
-y = 2 * X.squeeze() + np.random.randn(n_samples) * 2  # Target com ruído
+# =========================
+# Métrica customizada
+# =========================
+def custom_metric_fn(predictions, targets, metrics):
+    errors = predictions - targets
+    custom_value = np.sum(np.where(errors > 0, errors * 2, errors))
+    return MetricValue(
+        aggregate_results={
+            "custom_value": custom_value,
+            "value_per_prediction": custom_value / len(predictions),
+        }
+    )
 
-df = pd.DataFrame({"feature": X.squeeze(), "target": y})
-train_df, eval_df = train_test_split(df, test_size=0.2, random_state=42)
+custom_metric = make_metric(
+    eval_fn=custom_metric_fn,
+    greater_is_better=False,
+    name="custom_metric"
+)
 
-# ----------------------------
-# 2. Treinando modelo simples
-# ----------------------------
-model = LinearRegression()
-model.fit(train_df[["feature"]], train_df["target"])
+# =========================
+# Funções de plot para buffer
+# =========================
+def plot_to_buffer(fig):
+    buf = io.BytesIO()
+    fig.savefig(buf, format="png")
+    buf.seek(0)
+    plt.close(fig)
+    return buf
 
+def plot_underfit_overfit(param_range, train_rmse, test_rmse):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.plot(param_range, train_rmse, marker='o', label="Train RMSE")
+    ax.plot(param_range, test_rmse, marker='o', label="Test RMSE")
+    ax.set_xlabel("Max Depth")
+    ax.set_ylabel("RMSE")
+    ax.set_title("Underfitting vs Overfitting")
+    ax.legend()
+    ax.grid(True)
+    return plot_to_buffer(fig)
 
-# ----------------------------
-# 3. Função para visualização customizada
-# ----------------------------
-# ----------------------------
-# 3. Função para visualização customizada
-# ----------------------------
-def create_custom_plot(eval_df, builtin_metrics, artifacts_dir=None):
-    """
-    Cria gráfico Predictions vs Targets e salva como artifact no MLflow.
-    """
-    import matplotlib.pyplot as plt
-    import mlflow
+def plot_predictions_vs_target(predictions, targets):
+    fig, ax = plt.subplots(figsize=(10, 6))
+    ax.scatter(predictions, targets, alpha=0.5)
+    ax.plot([targets.min(), targets.max()],
+            [targets.min(), targets.max()],
+            color='red', linestyle='--', label='Ideal')
+    ax.set_xlabel("Predictions")
+    ax.set_ylabel("Targets")
+    ax.set_title("Predictions vs Targets")
+    ax.legend()
+    return plot_to_buffer(fig)
 
-    plt.figure(figsize=(8, 6))
-    plt.scatter(eval_df["feature"], eval_df["target"], alpha=0.6, label="Target")
-    plt.scatter(eval_df["feature"], model.predict(eval_df[["feature"]]),
-                alpha=0.6, color='orange', label="Predictions")
-    plt.xlabel("Feature")
-    plt.ylabel("Target / Predictions")
-    plt.title("Predictions vs Targets")
-    plt.legend()
+def log_plot_buffer(buf, artifact_name):
+    """Converte buffer BytesIO para PIL.Image e loga no MLflow"""
+    img = Image.open(buf)
+    mlflow.log_image(img, artifact_name)
 
-    # Salva o gráfico como artifact do run
-    plot_path = "custom_plot.png"
-    plt.savefig(plot_path)
-    plt.close()
+# =========================
+# Avaliação de diferentes complexidades
+# =========================
+param_range = list(range(1, 21))
+train_rmse_list = []
+test_rmse_list = []
 
-    # Loga o artifact no MLflow
-    mlflow.log_artifact(plot_path)
+with mlflow.start_run():
+    for depth in param_range:
+        model = RandomForestRegressor(n_estimators=100, max_depth=depth, random_state=42)
+        model.fit(X_train, y_train)
 
-    # Retorna dicionário esperado pelo evaluate
-    return {"custom_plot": plot_path}
+        y_train_pred = model.predict(X_train)
+        y_test_pred = model.predict(X_test)
 
+        train_rmse = np.sqrt(mean_squared_error(y_train, y_train_pred))
+        test_rmse = np.sqrt(mean_squared_error(y_test, y_test_pred))
 
+        train_rmse_list.append(train_rmse)
+        test_rmse_list.append(test_rmse)
 
-# ----------------------------
-# 4. Avaliação com MLflow
-# ----------------------------
-mlflow.set_experiment("exemplo_custom_plot")
+    # Melhor modelo (menor RMSE no teste)
+    best_idx = np.argmin(test_rmse_list)
+    best_model = RandomForestRegressor(n_estimators=100, max_depth=param_range[best_idx], random_state=42)
+    best_model.fit(X_train, y_train)
 
-with mlflow.start_run() as run:
-    # Log do modelo
-    mlflow.sklearn.log_model(model, "linear_model")
+    signature = infer_signature(X_test, best_model.predict(X_test))
+    model_info = mlflow.sklearn.log_model(best_model, name="best_model", signature=signature)
 
-    # URI do modelo para avaliação
-    model_uri = f"runs:/{run.info.run_id}/linear_model"
+    # Dataset de avaliação
+    eval_data = pd.DataFrame(X_test)
+    eval_data["target"] = y_test
 
-    # Avaliação com artifact customizado
+    # =========================
+    # Log plots usando buffer + PIL
+    # =========================
+    buf_under_over = plot_underfit_overfit(param_range, train_rmse_list, test_rmse_list)
+    log_plot_buffer(buf_under_over, "underfit_overfit.png")
+
+    predictions = best_model.predict(X_test)
+    buf_pred_target = plot_predictions_vs_target(predictions, y_test)
+    log_plot_buffer(buf_pred_target, "prediction_vs_target.png")
+
+    # Avaliação MLflow
     result = mlflow.models.evaluate(
-        model=model_uri,
-        data=eval_df,
+        model_info.model_uri,
+        eval_data,
         targets="target",
         model_type="regressor",
-        custom_artifacts=[create_custom_plot],
+        extra_metrics=[custom_metric],
     )
+
+    print("Custom Value:", result.metrics['custom_metric/custom_value'])

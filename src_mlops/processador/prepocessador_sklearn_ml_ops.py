@@ -1,20 +1,20 @@
 import logging
 import re
-from datetime import datetime
 
 import mlflow
 import pandas as pd
+from mlflow.models.signature import infer_signature
 from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
 
-from src_machine_learning.avaliador_mlops.avaliador import Avaliador
-from src_machine_learning.config.variaveis import PassoPipelineSklearn
-from src_machine_learning.estrategia_modelo.estrategia_modelo import EstrategiaModelo
-from src_machine_learning.processador.processador_mlops import Processador
-from src_machine_learning.utils.config_log import configurar_logging
-from src_machine_learning.utils.mlflow_config import configurar_mlflow
+from src_mlops.avaliador_mlops.avaliador import Avaliador
+from src_mlops.config.variaveis import PassoPipelineSklearn
+from src_mlops.estrategia_modelo.estrategia_modelo import EstrategiaModelo
+from src_mlops.processador.processador_mlops import Processador
+from src_mlops.utils.config_log import configurar_logging
+from src_mlops.utils.mlflow_config import configurar_mlflow
 
 configurar_logging()
 
@@ -25,6 +25,8 @@ class PrepocessadorSklearnn(Processador):
 
     def __init__(self, estratregia_modelo: EstrategiaModelo, avaliador: Avaliador):
         super().__init__(estratregia_modelo=estratregia_modelo, avaliador=avaliador)
+        self._x_train = None
+        self._y_train = None
 
     def _preparar_modelo(self, **kwargs) -> PassoPipelineSklearn:
         num_pipeline = Pipeline(steps=[
@@ -49,6 +51,22 @@ class PrepocessadorSklearnn(Processador):
         preprocessador = ('preprocessor', preprocessor)
         return [feature_engineering, preprocessador]
 
+    def _custom_artifact_underfit_overfit(
+            self,
+            eval_df,
+            builtin_metrics,
+            artifacts_dir
+    ):
+        pipeline = self._estrategia_modelo.dados_treinamento
+
+        metricas = self._avaliador.obter_dados_curva_validacao(
+            pipeline=pipeline,
+            X_train=self._x_train,
+            y_train=self._y_train
+        )
+
+        return self._avaliador.gerar_grafico_underfit_overfit(metricas)
+
     def executar(self, opcao: int):
 
         match opcao:
@@ -56,82 +74,65 @@ class PrepocessadorSklearnn(Processador):
                 texto = self._estrategia_modelo.__class__.__name__
                 parte = re.sub(r'^Estrategia', '', texto)
                 resultado = re.sub(r'(?<!^)([A-Z])', r'_\1', parte).lower()
-                MLFLOW_URI = "http://172.25.0.5:5000"
 
-                EXPERIMENT_NAME = f"treinamento_simples_{resultado}_v2"
+                MLFLOW_URI = "http://172.25.0.5:5000"
+                EXPERIMENT_NAME = f"treinamento_simples_{resultado}_metricas"
                 configurar_mlflow(experiment_name=EXPERIMENT_NAME, tracking_uri=MLFLOW_URI)
 
                 logger.info(f'Treinando modelo {resultado}')
+
+                # Carrega e processa dataframe
                 dataframe = self.abrir_dataframe()
                 dataframe = self.fazer_processamento(dataframe)
 
                 x_train, x_test, y_train, y_test = self._separar_treino_teste(dataframe=dataframe)
+                self._x_train = x_train
+                self._y_train = y_train
 
+                # Prepara pipeline
                 passos_pipeline = self._preparar_modelo()
-
                 self._estrategia_modelo.pipeline = passos_pipeline
+
                 artifact_name = f"modelo_pipeline_{resultado}"
-                mlflow.sklearn.autolog()
+                mlflow.sklearn.autolog()  # ativa autolog
 
                 with mlflow.start_run(run_name=f'treinamento_simples_{resultado}') as run:
+                    # Treina modelo
                     self._estrategia_modelo.treinar_modelo(x=x_train, y=y_train)
 
+                    # Recupera pipeline treinada
                     pipeline = self._estrategia_modelo.dados_treinamento
-                    regressor = pipeline.named_steps['regressor']
 
+                    # Faz previsões para assinatura
                     previsoes = self._estrategia_modelo.predizer_modelo(x_test=x_test)
-                    # Loga o pipeline completo
-                    print(self._estrategia_modelo.pipeline)
+                    signature = infer_signature(x_train, previsoes)
 
-                    model_uri = f"runs:/{run.info.run_id}/{artifact_name}"
+                    model_info = mlflow.sklearn.log_model(pipeline, name="model", signature=signature)
+
+                    # Log pipeline completo no MLflow
+
+                    eval_data = x_test.copy()
+                    eval_data["preco"] = y_test
+                    for col in self._features_categoricas:
+                        eval_data[col] = eval_data[col].astype(object)
+                    for col in self._features_numericas:
+                        eval_data[col] = eval_data[col].astype(float)
+                    result = mlflow.models.evaluate(
+                        model_info.model_uri,
+                        eval_data,
+                        targets="preco",
+                        model_type="regressor",
+                        custom_artifacts=[self._custom_artifact_underfit_overfit]
+                    )
+
+                    print(f"MAE: {result.metrics['mean_absolute_error']:.3f}")
+                    print(f"RMSE: {result.metrics['root_mean_squared_error']:.3f}")
+                    print(f"R² Score: {result.metrics['r2_score']:.3f}")
+
                     registered_model_name = artifact_name
 
-                    mlflow.sklearn.log_model(
-                        sk_model=self._estrategia_modelo.pipeline,
-                        artifact_path=f"modelo_pipeline_{resultado}"
-                    )
-                    mlflow.register_model(model_uri, registered_model_name)
-
-                    flag_polinomial = self._estrategia_modelo.polinomial
-                    # if flag_polinomial:
-                    #     resultado = f'{resultado}_polinomial'
-                    #
-                    #
-                    #
-                    dados = self._avaliador.obter_dados_curva_validacao(
-                        pipeline=pipeline,
-                        y_train=y_train,
-                        X_train=x_train
-                    )
-
-                    if dados is not None:
-                        media_se_lista = lambda x: sum(x) / len(x) if isinstance(x, list) and len(x) > 0 else x
-
-                        for metric_name, value in dados.items():
-                            print(metric_name, value)
-                            mlflow.log_metric(metric_name, media_se_lista(value))
-                        dados['nome_modelo'] = resultado
-                        dados['data_coleta'] = datetime.now().strftime("%d/%m/%Y %H:%M:%S")
-
-                        self._avaliador.gerar_grafico_underfit_overfit(dados)
-
-                        self._avaliador.gerar_grafico_underfit_overfit(dados)
-
-                    resultado_previsoes_modelo_simples = self._avaliador.obter_resultados_modelo(
-                        pipeline=pipeline,
-                        y_test=y_test,
-                        y_pred=previsoes
-                    )
-                    print(resultado_previsoes_modelo_simples)
-
-                    for dado in resultado_previsoes_modelo_simples.items():
-                        if isinstance(dado[1], dict):
-                            print('verdadeiro')
-                            for item in dado[1].items():
-                                mlflow.log_metric(item[0], item[1])
-                        else:
-                            print('falso')
-                            mlflow.log_metric(dado[0], dado[1])
+                    mlflow.register_model(model_info.model_uri, registered_model_name)
+                    logger.info(f"Modelo registrado como: {registered_model_name}")
 
             case 2:
 
@@ -222,4 +223,3 @@ class PrepocessadorSklearnn(Processador):
                     flag_polinomial = self._estrategia_modelo.polinomial
                     if flag_polinomial:
                         nome_modelo = f'{nome_modelo}_polinomial'
-
