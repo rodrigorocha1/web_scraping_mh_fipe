@@ -21,9 +21,9 @@ model:
       min_samples_leaf: 1
       min_samples_split: 10
       criterion: friedman_mse
-      ccp_alpha: 0.0
+      ccp_alpha: 0.001
       max_features: null
-      max_depth: 20
+      max_depth: 30
       n_jobs: 1
 
     arvore_decisao:
@@ -99,14 +99,12 @@ model:
       alpha: 1.0
       fit_intercept: True
       max_iter: 5000
-      positive: False
       tol: 0.001
       random_state: 42
 
 
     regressao_linear_lasso:
-      alpha: 0.1
-      fit_intercept: False
+      fit_intercept: True
       max_iter: 5000
       tol: 0.001
       random_state: 42

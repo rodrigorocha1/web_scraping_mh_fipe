@@ -1,14 +1,11 @@
-import io
 import logging
-from datetime import datetime
 from io import BytesIO
 from typing import Dict, Any, List, Optional
 
 import mlflow
-from PIL import Image
 import numpy as np
+from PIL import Image
 from matplotlib import pyplot as plt
-from mlflow.metrics import MetricValue
 from pandas import Series, DataFrame
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
 from sklearn.model_selection import GridSearchCV, validation_curve
@@ -101,7 +98,8 @@ class AvaliadorArvoreDecisao(Avaliador):
         self._logger.info("=" * 80)
         return regras
 
-    def obter_resultados_modelo(self, pipeline: Pipeline, y_test: Series, y_pred:  np.ndarray[Any, np.dtype[Any]]) -> Dict[str, Any]:
+    def obter_resultados_modelo(self, pipeline: Pipeline, y_test: Series, y_pred: np.ndarray[Any, np.dtype[Any]]) -> \
+    Dict[str, Any]:
         assert pipeline is not None, "Pipeline não foi treinado"
 
         tree: DecisionTreeRegressor = pipeline.named_steps['regressor']
@@ -172,8 +170,6 @@ class AvaliadorArvoreDecisao(Avaliador):
 
             # "regras_arvore": regras_arvore
         }
-
-
 
         return resultados
 
@@ -256,10 +252,7 @@ class AvaliadorArvoreDecisao(Avaliador):
         mlflow.log_image(img, "over_under_av.png")
         plt.close(fig)
 
-
-
-
-    def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:
+    def obter_resultado_grid_search(self, grid_search: GridSearchCV) -> Dict[str, Any]:
         best_params = grid_search.best_params_
         best_estimator = grid_search.best_estimator_
         best_score = grid_search.best_score_

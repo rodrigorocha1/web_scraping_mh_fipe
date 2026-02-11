@@ -1,10 +1,10 @@
-from datetime import datetime
 from io import BytesIO
 from typing import Dict, Any
 
 import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
+from PIL import Image
 from pandas import Series, DataFrame
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
 from sklearn.model_selection import GridSearchCV, validation_curve
@@ -43,7 +43,8 @@ class AvaliadorSVR(Avaliador):
         }
         return dados
 
-    def obter_resultados_modelo(self, pipeline: Pipeline, y_test: Series, y_pred:  np.ndarray[Any, np.dtype[Any]]) -> Dict[str, Any]:
+    def obter_resultados_modelo(self, pipeline: Pipeline, y_test: Series, y_pred: np.ndarray[Any, np.dtype[Any]]) -> \
+    Dict[str, Any]:
         assert pipeline is not None, "Pipeline não foi treinado"
 
         y_test_arr = np.asarray(y_test)
@@ -117,11 +118,12 @@ class AvaliadorSVR(Avaliador):
         buf = BytesIO()
         fig.savefig(buf, format="png")
         buf.seek(0)
-        mlflow.log_image(buf, f"under_over_svr_{nome_modelo}.png")
+        img = Image.open(buf)
+        mlflow.log_image(img, f"under_over_svr_{nome_modelo}.png")
 
         plt.close(fig)
 
-    def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:
+    def obter_resultado_grid_search(self, grid_search: GridSearchCV) -> Dict[str, Any]:
         def to_native(val):
             if isinstance(val, (np.integer, np.int32, np.int64)):
                 return int(val)

@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from io import BytesIO
 from typing import Dict, Any
 
@@ -7,6 +6,7 @@ import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
 import sklearn
+from PIL import Image
 from pandas import Series, DataFrame
 from sklearn.base import BaseEstimator
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
@@ -26,7 +26,7 @@ class AvaliadorRegressaoLinear(Avaliador):
         regressor = pipeline.named_steps["regressor"]
 
         if not hasattr(regressor, "alpha"):
-           return
+            return
 
         train_scores, val_scores = validation_curve(
             estimator=pipeline,
@@ -51,6 +51,7 @@ class AvaliadorRegressaoLinear(Avaliador):
             "best_alpha": float(self._param_range[best_idx]),
             "best_rmse": float(val_rmse[best_idx]),
         }
+
     @staticmethod
     def __obter_nomes_features(pipeline: sklearn.pipeline.Pipeline) -> list[str]:
         preprocessor = pipeline.named_steps["preprocessor"]
@@ -133,7 +134,8 @@ class AvaliadorRegressaoLinear(Avaliador):
         buf = BytesIO()
         fig.savefig(buf, format="png")
         buf.seek(0)
-        mlflow.log_image(buf, f"under_over_linear.png")
+        img = Image.open(buf)
+        mlflow.log_image(img, f"under_over_linear.png")
 
         plt.close(fig)
 

@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from io import BytesIO
 from typing import Dict, Any
 
@@ -7,6 +6,7 @@ import matplotlib.pyplot as plt
 import mlflow
 import numpy as np
 import sklearn
+from PIL import Image
 from pandas import Series, DataFrame
 from sklearn.metrics import (
     mean_absolute_error,
@@ -170,7 +170,8 @@ class AvaliadorRegressaoLinearRegularizada(Avaliador):
         buf = BytesIO()
         fig.savefig(buf, format="png")
         buf.seek(0)
-        mlflow.log_image(buf, f"under_over_{nome_modelo}.png")
+        img = Image.open(buf)
+        mlflow.log_image(img, f"under_over_{nome_modelo}.png")
 
         plt.close(fig)
 

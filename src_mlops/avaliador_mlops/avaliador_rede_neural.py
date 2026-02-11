@@ -1,9 +1,9 @@
-from datetime import datetime
 from io import BytesIO
 from typing import Dict, Any
 
 import mlflow
 import numpy as np
+from PIL import Image
 from matplotlib import pyplot as plt
 from pandas import Series, DataFrame
 from sklearn.metrics import mean_absolute_error, mean_squared_error, median_absolute_error, r2_score
@@ -109,7 +109,8 @@ class AvaliadorRedeNeural(Avaliador):
         buf = BytesIO()
         fig.savefig(buf, format="png")
         buf.seek(0)
-        mlflow.log_image(buf, f"under_over_rede_neural.png")
+        img = Image.open(buf)
+        mlflow.log_image(img, f"under_over_rede_neural.png")
         plt.close(fig)
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) -> Dict[str, Any]:

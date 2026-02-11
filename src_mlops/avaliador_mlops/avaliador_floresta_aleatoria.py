@@ -1,5 +1,4 @@
 import logging
-from datetime import datetime
 from io import BytesIO
 from typing import Dict, Any, Counter
 
@@ -137,7 +136,8 @@ class AvaliadorFlorestaAleatoria(Avaliador):
 
         self._logger.info("=" * 90)
 
-    def obter_resultados_modelo(self, pipeline: Pipeline, y_test: Series, y_pred:  np.ndarray[Any, np.dtype[Any]]) -> Dict[str, Any]:
+    def obter_resultados_modelo(self, pipeline: Pipeline, y_test: Series, y_pred: np.ndarray[Any, np.dtype[Any]]) -> \
+    Dict[str, Any]:
         assert pipeline is not None, "Pipeline não foi treinado"
         rf: RandomForestRegressor = pipeline.named_steps['regressor']
         preprocessor = pipeline.named_steps['preprocessor']
@@ -304,7 +304,7 @@ class AvaliadorFlorestaAleatoria(Avaliador):
         mlflow.log_image(img, "over_under_random_forest.png")
         plt.close(fig)
 
-    def obter_resultado_grid_search(self, grid_search: GridSearchCV) ->  Dict[str, Any]:
+    def obter_resultado_grid_search(self, grid_search: GridSearchCV) -> Dict[str, Any]:
         def to_native(val):
             if isinstance(val, (np.integer, np.int32, np.int64)):
                 return int(val)
@@ -358,4 +358,3 @@ class AvaliadorFlorestaAleatoria(Avaliador):
             "best_rmse": best_rmse,
             "feature_importances": feature_importances
         }
-
