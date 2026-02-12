@@ -1,5 +1,7 @@
 import logging
+import pickle
 import re
+from typing import List
 
 import mlflow
 import pandas as pd
@@ -8,6 +10,7 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
+from sklearn.ensemble import VotingRegressor
 
 from src_mlops.avaliador_mlops.avaliador import Avaliador
 from src_mlops.config.variaveis import PassoPipelineSklearn
@@ -23,10 +26,12 @@ logger = logging.getLogger(__name__)
 
 class PrepocessadorSklearnn(Processador):
 
-    def __init__(self, estratregia_modelo: EstrategiaModelo, avaliador: Avaliador):
+    def __init__(self, estratregia_modelo: EstrategiaModelo, avaliador: Avaliador,
+                 modelos_votacao: List[EstrategiaModelo] = None):
         super().__init__(estratregia_modelo=estratregia_modelo, avaliador=avaliador)
         self._x_train = None
         self._y_train = None
+        self.__modelos_votacao = modelos_votacao
 
     def _preparar_modelo(self, **kwargs) -> PassoPipelineSklearn:
         num_pipeline = Pipeline(steps=[
@@ -162,7 +167,7 @@ class PrepocessadorSklearnn(Processador):
                         pass
 
                     mlflow.sklearn.log_model(
-                        sk_model= resultado_grid.best_params_,
+                        sk_model=resultado_grid.best_params_,
                         artifact_path="model",
                         registered_model_name=f"{nome_modelo}_v2"
                     )
@@ -185,6 +190,19 @@ class PrepocessadorSklearnn(Processador):
                 # x_tests = x_test.to_numpy()
                 # y_trains = y_train.to_numpy()
                 # y_tests = y_test.to_numpy()
+
+                dados_para_salvar = {
+                    'x_train': x_train,
+                    'x_test': x_test,
+                    'y_train': y_train,
+                    'y_test': y_test
+
+                }
+
+                with open('dados_completos.pkl', 'wb') as arquivo:
+                    pickle.dump(dados_para_salvar, arquivo)
+
+                print("Dados gravados com sucesso em 'dados_completos.pkl'!")
 
                 x_completo = pd.concat((x_train, x_test), axis=0)
                 y_completo = pd.concat((y_train, y_test), axis=0)
@@ -229,3 +247,34 @@ class PrepocessadorSklearnn(Processador):
                             artifact_path="model",
                             registered_model_name=f"{nome_modelo}_cv_v2"
                         )
+
+            case 4:
+                print('votação com os melhores modelos')
+                texto = self._estrategia_modelo.__class__.__name__
+                parte = re.sub(r'^Estrategia', '', texto)
+                nome_modelo = re.sub(r'(?<!^)([A-Z])', r'_\1', parte).lower()
+
+                MLFLOW_URI = "http://172.25.0.5:5000"
+
+                EXPERIMENT_NAME = f"regressao_votacao_v2"
+                configurar_mlflow(experiment_name=EXPERIMENT_NAME, tracking_uri=MLFLOW_URI)
+
+                dataframe = self.abrir_dataframe()
+                dataframe = self.fazer_processamento(dataframe)
+                x_train, x_test, y_train, y_test = self._separar_treino_teste(dataframe=dataframe)
+                passos_pipeline = self._preparar_modelo()
+                x_completo = pd.concat([x_train, x_test], axis=0)
+                y_completo = pd.concat([y_train, y_test], axis=0)
+
+                dados_para_salvar = {
+                    'x_train': x_train,
+                    'x_test': x_test,
+                    'y_train': y_train,
+                    'y_test': y_test
+
+                }
+
+                with open('dados_completos.pkl', 'wb') as arquivo:
+                    pickle.dump(dados_para_salvar, arquivo)
+
+                print("Dados gravados com sucesso em 'dados_completos.pkl'!")

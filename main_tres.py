@@ -164,27 +164,27 @@ def executar_testes_multicomp_rmse(df, arquivo_figura):
 
     print(f"🖼️ Gráfico Tukey salvo em: fig/{arquivo_figura}")
 df_final: pd.DataFrame = pd.concat(dfs, ignore_index=True)
-print(df_final)
-# df_processado = executar_testes_normalidade(df_final)
-#
-# df_processado = processar_e_salvar_resultados(df_resultados=df_processado, )
-#
-#
-#
-# labels = df_final['experiment_name'].unique()
-# modelos = df_final['experiment_name'].unique()
-# gerar_graficos_distribuicao_rmse(
-#     df_final,
-#     modelos=modelos,
-#     labels=labels,
-#     nome_img='distribuicao_normal.png',
-#     nome_pdf='distribuicao_normal.pdf'
-# )
-#
-# executar_testes_multicomp_rmse(
-#         df_final,
-#         "tukey_rmse.png"
-#     )
+
+df_processado = executar_testes_normalidade(df_final)
+
+df_processado = processar_e_salvar_resultados(df_resultados=df_processado, )
+
+
+
+labels = df_final['experiment_name'].unique()
+modelos = df_final['experiment_name'].unique()
+gerar_graficos_distribuicao_rmse(
+    df_final,
+    modelos=modelos,
+    labels=labels,
+    nome_img='distribuicao_normal.png',
+    nome_pdf='distribuicao_normal.pdf'
+)
+
+executar_testes_multicomp_rmse(
+        df_final,
+        "tukey_rmse.png"
+    )
 
 df_pivot = df_final.pivot(
     index='run_name',

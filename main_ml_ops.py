@@ -62,6 +62,7 @@ for modelo in tqdm(
     logging.info(
         f'Tempo de execução do modelo {modelo_ml.__class__.__name__}: {minutos_modelo}:{segundos_modelo:02d} minutos'
     )
+    break
 tempo_fim = time.time()
 tempo_execucao_total = tempo_fim - inicio_modelo
 
