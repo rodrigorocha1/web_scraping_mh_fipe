@@ -23,7 +23,7 @@ from src_mlops.estrategia_modelo.estrategia_regressao_svr import EstrategiaRegre
 from src_mlops.processador.prepocessador_sklearn_ml_ops import PrepocessadorSklearnn
 
 opcao = 1
-opcao_execucao = 3
+opcao_execucao = 1
 inicio_modelo = time.time()
 modelos: List[Tuple] = [
     (AvaliadorArvoreDecisao(), EstrategiaRegressaoArvoreDeDecisao(opcao=opcao)),
@@ -62,7 +62,7 @@ for modelo in tqdm(
     logging.info(
         f'Tempo de execução do modelo {modelo_ml.__class__.__name__}: {minutos_modelo}:{segundos_modelo:02d} minutos'
     )
-    break
+
 tempo_fim = time.time()
 tempo_execucao_total = tempo_fim - inicio_modelo
 

@@ -10,7 +10,6 @@ from sklearn.compose import ColumnTransformer
 from sklearn.impute import SimpleImputer
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import FunctionTransformer, OneHotEncoder, StandardScaler
-from sklearn.ensemble import VotingRegressor
 
 from src_mlops.avaliador_mlops.avaliador import Avaliador
 from src_mlops.config.variaveis import PassoPipelineSklearn
@@ -82,6 +81,7 @@ class PrepocessadorSklearnn(Processador):
                 passos_pipeline = self._preparar_modelo()
                 self._estrategia_modelo.pipeline = passos_pipeline
 
+
                 artifact_name = f"modelo_pipeline_{resultado}"
                 mlflow.sklearn.autolog()  # ativa autolog
 
@@ -96,8 +96,12 @@ class PrepocessadorSklearnn(Processador):
                     previsoes = self._estrategia_modelo.predizer_modelo(x_test=x_test)
                     signature = infer_signature(x_train, previsoes)
 
-                    model_info = mlflow.sklearn.log_model(pipeline, name="model", signature=signature)
-
+                    model_info = mlflow.sklearn.log_model(
+                        sk_model=pipeline,  # Se isso for um sklearn.pipeline.Pipeline, está correto
+                        artifact_path="model",
+                        signature=signature,
+                        registered_model_name=artifact_name
+                    )
                     # Log pipeline completo no MLflow
 
                     eval_data = x_test.copy()
@@ -106,11 +110,17 @@ class PrepocessadorSklearnn(Processador):
                         eval_data[col] = eval_data[col].astype(object)
                     for col in self._features_numericas:
                         eval_data[col] = eval_data[col].astype(float)
+                    eval_data['ano_modelo'] = eval_data['ano_modelo'].astype("int64")
                     result = mlflow.models.evaluate(
+
                         model_info.model_uri,
+
                         eval_data,
+
                         targets="preco",
+
                         model_type="regressor"
+
                     )
 
                     print(f"MAE: {result.metrics['mean_absolute_error']:.3f}")
@@ -125,7 +135,6 @@ class PrepocessadorSklearnn(Processador):
 
                     registered_model_name = artifact_name
 
-                    mlflow.register_model(model_info.model_uri, registered_model_name)
                     logger.info(f"Modelo registrado como: {registered_model_name}")
 
             case 2:
@@ -169,7 +178,12 @@ class PrepocessadorSklearnn(Processador):
                     mlflow.sklearn.log_model(
                         sk_model=resultado_grid.best_params_,
                         artifact_path="model",
-                        registered_model_name=f"{nome_modelo}_v2"
+                        registered_model_name=f"{nome_modelo}_v2",
+                        pip_requirements=[
+                            "scikit-learn==1.4.2",
+                            "pandas",
+                            "numpy"
+                        ]
                     )
 
             case 3:
@@ -206,7 +220,7 @@ class PrepocessadorSklearnn(Processador):
 
                 x_completo = pd.concat((x_train, x_test), axis=0)
                 y_completo = pd.concat((y_train, y_test), axis=0)
-                print(x_completo)
+
                 passos_pipeline = self._preparar_modelo()
                 self._estrategia_modelo.pipeline = passos_pipeline
 
@@ -240,13 +254,19 @@ class PrepocessadorSklearnn(Processador):
 
                         mlflow.set_tag("iteracao", i)
                         mlflow.set_tag("nome_modelo", nome_modelo)
-
-                        # 🔥 REGISTRAR MODELO
-                        mlflow.sklearn.log_model(
-                            sk_model=self._estrategia_modelo.pipeline,
-                            artifact_path="model",
-                            registered_model_name=f"{nome_modelo}_cv_v2"
-                        )
+                        print(self._estrategia_modelo.pipeline)
+                        # # 🔥 REGISTRAR MODELO
+                        # mlflow.sklearn.log_model(
+                        #     sk_model=self._estrategia_modelo.pipeline,
+                        #     artifact_path="model",
+                        #     registered_model_name=f"{nome_modelo}_cv_v2",
+                        #     pip_requirements=[
+                        #         "scikit-learn==1.4.2",
+                        #         "pandas",
+                        #         "numpy"
+                        #     ]
+                        # )
+                        # break
 
             case 4:
                 print('votação com os melhores modelos')

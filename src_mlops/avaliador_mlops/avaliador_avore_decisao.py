@@ -249,7 +249,7 @@ class AvaliadorArvoreDecisao(Avaliador):
         fig.savefig(buf, format="png")
         buf.seek(0)
         img = Image.open(buf)
-        mlflow.log_image(img, "over_under_av.png")
+        mlflow.log_image(img, "plots/over_under_av.png")
         plt.close(fig)
 
     def obter_resultado_grid_search(self, grid_search: GridSearchCV) -> Dict[str, Any]:

@@ -84,6 +84,7 @@ class EstrategiaModeloSklearn(EstrategiaModelo[PassoPipelineSklearn, GridSearchC
             passos.append(self.__modelo)
 
         pipeline = Pipeline(passos)
+        self.treinar_modelo(x=x, y=y)
 
         kfold = KFold(n_splits=10, shuffle=True, random_state=iteracao)
 

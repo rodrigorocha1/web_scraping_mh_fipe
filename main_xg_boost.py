@@ -1,28 +1,29 @@
+from mlflow.tracking import MlflowClient
 import mlflow
+from src_mlops.utils.mlflow_config import configurar_mlflow
 
-MLFLOW_URI = "http://172.25.0.5:5000"
-mlflow.set_tracking_uri(MLFLOW_URI)
-mlflow.set_registry_uri(MLFLOW_URI)
+MLFLOW_URI = "http://localhost:5000"
 
-# Listar todos os experimentos
-experiments = mlflow.search_experiments(view_type=2)  # view_type=2 pega ativos + deletados
+EXPERIMENT_NAME = f"modelo_pronto_votacao"
+configurar_mlflow(experiment_name=EXPERIMENT_NAME, tracking_uri=MLFLOW_URI)
 
-for exp in experiments:
-    print(f"Deletando permanentemente: ID={exp.experiment_id}, Name={exp.name}")
+client = MlflowClient()
 
-    # Primeiro, marca como deleted (se ainda não estiver)
-    try:
-        mlflow.delete_experiment(exp.experiment_id)
-    except Exception as e:
-        print(f"Erro ao deletar: {e}")
+models = client.search_registered_models()
 
-    # Depois, purga permanentemente
-    try:
-        mlflow.purge_experiment(exp.experiment_id)
-    except AttributeError:
-        # Em algumas versões do MLflow, purge_experiment não existe
-        print("mlflow.purge_experiment() não disponível nesta versão. Verifique a versão do MLflow.")
-    except Exception as e:
-        print(f"Erro ao purgar: {e}")
+for model in models:
+    print(f"Nome: {model.name}")
+    print(f"Descrição: {model.description}")
+    print("-" * 40)
 
-print("Todos os experimentos foram removidos permanentemente.")
+run = mlflow.get_run("464858489e054717b030b8e66b869138")
+print(run.info.artifact_uri)
+
+
+run_id = "464858489e054717b030b8e66b869138"
+
+client = mlflow.tracking.MlflowClient()
+artifacts = client.list_artifacts(run_id)
+
+for a in artifacts:
+    print(a.path)
