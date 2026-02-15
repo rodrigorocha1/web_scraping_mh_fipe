@@ -224,37 +224,37 @@ class PrepocessadorSklearnn(Processador):
                 passos_pipeline = self._preparar_modelo()
                 self._estrategia_modelo.pipeline = passos_pipeline
 
-                for i in range(30):
-                    with mlflow.start_run(run_name=f"cv_iteracao_{i}", nested=True):
-
-                        logging.info(
-                            f'Fazendo validação cruzada para {nome_modelo} - Iteração {i}'
-                        )
-
-                        resultado_validacao_cruzada = self._estrategia_modelo.realizar_validacao_cruzada(
-                            x=x_completo,
-                            y=y_completo,
-                            iteracao=i
-                        )
-
-                        # Log parâmetros do pipeline
-                        for nome, valor in passos_pipeline:
-                            if hasattr(valor, 'get_params'):
-                                params = valor.get_params()
-                                for p_nome, p_valor in params.items():
-                                    mlflow.log_param(f"{nome}_{p_nome}", p_valor)
-
-                        # Métricas médias
-                        for metrica, valor in resultado_validacao_cruzada["mean_scores"].items():
-                            mlflow.log_metric(metrica, valor)
-
-                        # Métricas por fold
-                        for idx, rmse in enumerate(resultado_validacao_cruzada["rmse_folds"]):
-                            mlflow.log_metric(f"rmse_fold_{idx}", rmse)
-
-                        mlflow.set_tag("iteracao", i)
-                        mlflow.set_tag("nome_modelo", nome_modelo)
-                        print(self._estrategia_modelo.pipeline)
+                # for i in range(30):
+                #     with mlflow.start_run(run_name=f"cv_iteracao_{i}", nested=True):
+                #
+                #         logging.info(
+                #             f'Fazendo validação cruzada para {nome_modelo} - Iteração {i}'
+                #         )
+                #
+                #         resultado_validacao_cruzada = self._estrategia_modelo.realizar_validacao_cruzada(
+                #             x=x_completo,
+                #             y=y_completo,
+                #             iteracao=i
+                #         )
+                #
+                #         # Log parâmetros do pipeline
+                #         for nome, valor in passos_pipeline:
+                #             if hasattr(valor, 'get_params'):
+                #                 params = valor.get_params()
+                #                 for p_nome, p_valor in params.items():
+                #                     mlflow.log_param(f"{nome}_{p_nome}", p_valor)
+                #
+                #         # Métricas médias
+                #         for metrica, valor in resultado_validacao_cruzada["mean_scores"].items():
+                #             mlflow.log_metric(metrica, valor)
+                #
+                #         # Métricas por fold
+                #         for idx, rmse in enumerate(resultado_validacao_cruzada["rmse_folds"]):
+                #             mlflow.log_metric(f"rmse_fold_{idx}", rmse)
+                #
+                #         mlflow.set_tag("iteracao", i)
+                #         mlflow.set_tag("nome_modelo", nome_modelo)
+                #         print(self._estrategia_modelo.pipeline)
                         # # 🔥 REGISTRAR MODELO
                         # mlflow.sklearn.log_model(
                         #     sk_model=self._estrategia_modelo.pipeline,

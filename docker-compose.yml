@@ -88,6 +88,7 @@ services:
       MLFLOW_S3_IGNORE_TLS: "true"
       MLFLOW_HOST: ${MLFLOW_HOST}
       MLFLOW_PORT: ${MLFLOW_PORT}
+      MLFLOW_SERVER_ALLOWED_HOSTS: "*"
       TZ: America/Sao_Paulo
     command:
       - /bin/bash
@@ -102,6 +103,7 @@ services:
           --port "${MLFLOW_PORT}"
     ports:
       - "${MLFLOW_PORT}:${MLFLOW_PORT}"
+      - "5004:5004"
     healthcheck:
       test:
         [
@@ -116,6 +118,36 @@ services:
     networks:
       mlflow-network:
         ipv4_address: 172.25.0.5
+
+  mlflow-serving:
+    image: ghcr.io/mlflow/mlflow:${MLFLOW_VERSION}
+    container_name: mlflow-api-producao
+    depends_on:
+      mlflow:
+        condition: service_healthy
+    environment:
+      TZ: America/Sao_Paulo
+      MLFLOW_TRACKING_URI: http://mlflow-server:5000
+      AWS_ACCESS_KEY_ID: ${MINIO_ROOT_USER}
+      AWS_SECRET_ACCESS_KEY: ${MINIO_ROOT_PASSWORD}
+      MLFLOW_S3_ENDPOINT_URL: http://${MINIO_HOST}:${MINIO_PORT}
+      AWS_DEFAULT_REGION: us-east-1
+      MLFLOW_SERVER_ALLOWED_HOSTS: "*"
+
+
+    restart: always
+    command: >
+      mlflow models serve 
+      -m "models:/VotingRegressorPipeline/Production"
+      -p 5002
+      --host 0.0.0.0
+      --no-conda
+    ports:
+      - "5002:5002"
+    networks:
+      mlflow-network:
+        ipv4_address: 172.25.0.6
+
 
 networks:
   mlflow-network:
