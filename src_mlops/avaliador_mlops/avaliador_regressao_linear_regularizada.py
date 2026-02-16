@@ -17,7 +17,7 @@ from sklearn.metrics import (
 from sklearn.model_selection import GridSearchCV, validation_curve
 from sklearn.pipeline import Pipeline
 
-from src_machine_learning.avaliador.avaliador import Avaliador
+from src_mlops.avaliador_mlops.avaliador import Avaliador
 
 
 class AvaliadorRegressaoLinearRegularizada(Avaliador):

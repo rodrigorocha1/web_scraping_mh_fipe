@@ -32,6 +32,8 @@ class PrepocessadorSklearnn(Processador):
         self._y_train = None
         self.__modelos_votacao = modelos_votacao
 
+
+
     def _preparar_modelo(self, **kwargs) -> PassoPipelineSklearn:
         num_pipeline = Pipeline(steps=[
             ('imputer', SimpleImputer(strategy='median')),
@@ -132,6 +134,12 @@ class PrepocessadorSklearnn(Processador):
                         y_train=self._y_train
                     )
                     self._avaliador.gerar_grafico_underfit_overfit(metricas)
+                    self._avaliador.gerar_grafico_feature_importance(
+                        pipeline=pipeline,
+                        X_val=x_test,
+                        y_val=y_test,
+                        top_n=5
+                    )
 
                     registered_model_name = artifact_name
 
