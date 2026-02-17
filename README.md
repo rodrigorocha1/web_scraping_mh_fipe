@@ -129,13 +129,6 @@ O gráfico abaixo representa o resultado final para a escolha do modelo. Com bas
     • MinIO armazena os artifacts do modelo, garantindo acesso seguro e escalável.
     • A API de previsão pode fornecer estimativas de preços em tempo real para usuários finais ou sistemas integrados, facilitando decisões de compra, venda e avaliação de veículos.
 
-<div style="text-align:center;"> 
-  <iframe width="800" height="600" 
-    src="https://www.youtube.com/embed/J5dvQOxdkBo" 
-    title="YouTube video player" 
-    frameborder="0" 
-    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" 
-    allowfullscreen>
-  </iframe>
-</div>
+[![Assistir ao vídeo de demonstração do projeto](https://img.shields.io/badge/🎬%20Assistir%20ao%20vídeo-FF0000?style=for-the-badge&logo=youtube&logoColor=white)](https://youtu.be/J5dvQOxdkBo)
+
 
