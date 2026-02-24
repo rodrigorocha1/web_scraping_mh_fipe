@@ -61,16 +61,16 @@ Para garantir a robustez e escalabilidade do projeto, foram empregadas as seguin
 
 ### 4.1 Análise Exploratória de Dados (EDA)
 
-![Distribuição de Preços](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/precos.png?token=GHSAT0AAAAAADRHNADTLM7F5VTDBH42ESOQ2MTWIGA)
+![Distribuição de Preços](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/precos.png)
+
+
 
 
 A figura acima mostra a distribuição de preços do carro. Ela mosta que a grande maioria de carros, variam de R$30 mil a R$ 150 mil, indicqando carros populares, puxando a calda mais a equerda, para regressores lineares, podem ter dificuldade com essa assimétria.
 
 ### 4.2 – Análise overfiting – underfiting
 
-![Over Under](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/over_under_random_forest.png?token=GHSAT0AAAAAADRHNADSALSLEKQEX7ARPT6O2MTWKTQ)
-
-
+![Over Under](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/over_under_random_forest.png)
 A figura acima mostra o desempenho overfiting e underfiting, com base nas diferenças do rmse treino e teste, o modelo consegue generalizar para os dados novos.
 
 ### 4.3 Desempenho dos Modelos Preditivos
@@ -100,10 +100,13 @@ A tabela abaixo mostra os melhores resultados após o tuning de parâmetros:
 ### 4.4 – Análise da Importância dos Atributos
 
 
-<div style="display: flex; gap: 10px;">
-  <img src="https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/feature_importance_TransformedTargetRegressor.png?token=GHSAT0AAAAAADRHNADSZE26KXEIUHNZJLII2MTWOCA" width="50%">
-  <img src="https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/feature_importance_RandomForestRegressor.png?token=GHSAT0AAAAAADRHNADTUHK3UEDI24XJR6UE2MTWOGA" width="50%">
-</div>
+![Distribuição de Preços](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/feature_importance_TransformedTargetRegressor.png)
+
+
+![Distribuição de Preços](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/feature_importance_RandomForestRegressor.png)
+
+
+
 
 
 As figuras acimas mostram as importancias das caracteristicas para random florest e rede neural. Os gráficos revalo para o atributo ano modelo do random forest, este apresenta 50% da importância , mostrando que a drepeciação temporal é um fator decisivo para o modelo.
@@ -117,8 +120,7 @@ O teste de Friedman é um teste não paramétrico para medidas repetidas, usado 
 O teste de Nemenyi é um teste pós-hoc não paramétrico, usado após o teste de Friedman para comparar pares de grupos e identificar quais tratamentos diferem.
 ``
 
-![Over Under](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/cd_diagram_scikit_posthocs.png?token=GHSAT0AAAAAADRHNADTNME4BRI7HHTNMCCE2MTWSFA)
-
+![Over Under](https://raw.githubusercontent.com/rodrigorocha1/web_scraping_mh_fipe/refs/heads/master/fig/over_under_random_forest.png)
 
 
 O gráfico abaixo representa o resultado final para a escolha do modelo. Com base no modelo, random florest e rede neural são estátiticamente iguais, mas diferêntes das quatro regressões lineares. Regressão svr (SVM), teve o pior desempenho entre os modelos.
