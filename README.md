@@ -1,15 +1,4 @@
----
-layout: post
-title:  "Previsão de Preços de Veículos – Base FIPE Janeiro de 2026"
-summary: "O presente projeto tem como objetivo aplicar conceitos de Machine Learning para previsão de preços de veículos, abrangendo todas as etapas, desde o pré-processamento dos dados, treinamento de modelos até a implementação em ambiente de produção."
-author: Rodrigo
-date: '2026-02-16 20:56:00 -0300'
-category: ['machine_learning', 'regressao', 'python']
-thumbnail: /assets/img/posts/previsao_preco_carros/thumb.png
-keywords: Machine Learning, Regressão, Python
-usemathjax: true
-permalink: /blog/previsao_preco_carros/
----
+# Previsão de Preços de Veículos – Base FIPE Janeiro de 2026
 
 Utiliziei a base de dados da FIPE referente ao mês de janeiro de 2026, para as segintes marcas: **Audi**, **BYD**, **GM (Chevrolet)**, **Citroën**, **Fiat**, **Ford**, **Honda**, **Hyundai**, **IVECO**, **JAC**, **Jeep**, **Kia Motors**, **Mercedes-Benz**, **Mitsubishi**, **Nissan**, **Peugeot**, **Renault**, **Toyota**, **Volkswagen**, **Troller** e **Volvo**, para os modelos de carro a partir do ano de 2000.  
 
